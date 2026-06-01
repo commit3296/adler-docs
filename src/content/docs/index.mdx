@@ -1,0 +1,103 @@
+---
+title: Adler
+description: OSINT username search across ~3,000 sites — built for operators reaching Cloudflare-walled, TLS-fingerprinted, geo-restricted, login-walled sites.
+template: splash
+hero:
+  tagline: OSINT username search across ~3,000 sites, in Rust. Honest verdicts and built to reach the hard ones — Cloudflare-walled, TLS-fingerprinted, geo-restricted, login-walled.
+  actions:
+    - text: Install
+      link: /adler-docs/install/
+      icon: right-arrow
+      variant: primary
+    - text: Quickstart
+      link: /adler-docs/quickstart/
+      icon: right-arrow
+      variant: secondary
+    - text: View on GitHub
+      link: https://github.com/commit3296/adler
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+> *Named for Irene Adler — "the Woman", the one who outwitted Sherlock Holmes.
+> Where Sherlock searched, Adler outsmarts.*
+
+## What you get
+
+<CardGrid stagger>
+  <Card title="Honest verdicts" icon="approve-check">
+    `Found` / `NotFound` / `Uncertain(reason)` — when a Cloudflare wall, login
+    page, or rate-limit blocked us, we say so instead of guessing. Adler
+    distinguishes "verified-absent" from "I gave up at the first wall".
+  </Card>
+  <Card title="Reach the hard sites" icon="rocket">
+    Per-site geo / IP-type routing, operator session injection for
+    login-walled sites, Chrome 134 TLS-fingerprint emulation, and headless
+    Chrome for bot-protected platforms — all bounded by per-scan budgets.
+  </Card>
+  <Card title="Self-healing registry" icon="setting">
+    `adler --doctor` validates every detection signal; `--doctor --fix`
+    diffs present/absent responses and proposes corrected signatures.
+    A nightly GitHub Action sweeps the registry and flags structural rot.
+  </Card>
+  <Card title="CLI · Library · Web UI · API" icon="puzzle">
+    Single Rust binary for the terminal; `adler-core` on crates.io for
+    embedding; `adler --web` launches a SolidJS SPA with live SSE streaming;
+    JSON API for driving from your own frontend or scripts.
+  </Card>
+</CardGrid>
+
+## Reading order
+
+For first-time users:
+
+1. **[Install](/adler-docs/install/)** — `cargo binstall`, `cargo install`, or build from source.
+2. **[Quickstart](/adler-docs/quickstart/)** — first scan in under a minute.
+3. **[Usage](/adler-docs/usage/)** — filtering / output / network / browser / batch.
+
+For operators going beyond the basics:
+
+- **[Access engine](/adler-docs/access-engine/)** — how Adler reaches sites
+  that block plain HTTP (browser backend, impersonate, egress pool,
+  sessions, automatic escalation).
+- **[Web UI](/adler-docs/web-ui/)** — the SPA, the access modal, per-scan
+  egress subset selection.
+- **[Embedding](/adler-docs/embedding/)** — drive `adler-core` from your
+  own Rust code.
+
+If something isn't behaving as expected, the **[FAQ](/adler-docs/faq/)**
+covers the common cases (everything Uncertain, why fewer Found than
+Sherlock / Maigret, sock-puppet legality, …).
+
+## How Adler compares
+
+The honest positioning vs other open-source username-search tools, on the
+dimensions that matter when sites push back:
+
+|                                | [Sherlock][s] | [Maigret][m] | [Blackbird][b] | [Snoop][sn] | **Adler** |
+| ------------------------------ | :---: | :---: | :---: | :---: | :---: |
+| Approx. sites                  | 400 | 3,000 | 600 | 5,400 | 3,000 |
+| Verdict model                  | Found / NotFound | Found / NotFound | Found / NotFound | Found / NotFound | **Found / NotFound / Uncertain(reason)** |
+| Bot-protected sites            | — | — | — | — | **headless Chrome** |
+| TLS-fingerprint blocking       | — | — | — | — | **Chrome 134 emulation** |
+| Per-site geo / IP-type routing | one global | one global + Tor + I2P | — | — | **per-site policy** |
+| Login-walled sites             | — | global `cookies.txt` | — | — | **per-site named sessions** |
+| Automatic escalation           | — | — | — | — | **cheap → browser on CF / 429** |
+| Self-healing registry          | — | — | — | — | **`--doctor --fix`** |
+| Web UI                         | — | yes | — | — | **SolidJS SPA + SSE + JSON API** |
+| Embeddable library             | — | partial | — | — | **`adler-core` on crates.io (Rust)** |
+| Runtime / packaging            | Python | Python | Python | Python | **Rust — single static binary** |
+
+[s]: https://github.com/sherlock-project/sherlock
+[m]: https://github.com/soxoj/maigret
+[b]: https://github.com/p1ngul1n0/blackbird
+[sn]: https://github.com/snooppr/snoop
+
+**Adler's thesis: honest verdicts plus access for the sites that matter.**
+A `NotFound` from a Python-HTTP-only tool on a Cloudflare-walled,
+TLS-fingerprinted, geo-restricted, or login-walled site is often just "I
+gave up at the first wall." Adler reports `Uncertain(reason)` when it
+couldn't verify, and ships the transports you need to break the wall —
+without solving CAPTCHAs or evading human-verification.
