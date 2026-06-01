@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
+import remarkGfm from "remark-gfm";
 
 // Adler documentation site. Hosted on GitHub Pages at
 //   https://commit3296.github.io/adler-docs/
@@ -9,6 +10,14 @@ import starlight from "@astrojs/starlight";
 export default defineConfig({
     site: "https://commit3296.github.io",
     base: "/adler-docs",
+    // Astro applies remark-gfm to .md files by default, but the MDX
+    // integration does NOT inherit the default plugin list — so tables /
+    // task lists / autolinks silently render as plain text in `.mdx`
+    // pages (e.g. the compare table on the landing page). Adding it
+    // here propagates GFM to both `.md` and `.mdx`.
+    markdown: {
+        remarkPlugins: [remarkGfm],
+    },
     integrations: [
         starlight({
             title: "Adler",
