@@ -35,6 +35,65 @@ export default defineConfig({
             components: {
                 ThemeSelect: "./src/components/ThemeSelect.astro",
             },
+            // Mermaid v11 loaded once at <head>, themed to the SPA's
+            // dark palette. Pages opt in via `<pre class="mermaid">…</pre>`
+            // blocks — no per-page imports, no .mdx conversion needed.
+            // CDN-loaded (~70 KB gzipped, lazy after DOMContentLoaded);
+            // jsDelivr is GDPR-friendly and version-pinned.
+            head: [
+                {
+                    tag: "script",
+                    attrs: { type: "module" },
+                    content: `
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'base',
+  securityLevel: 'loose',
+  fontFamily: 'ui-monospace, JetBrains Mono, SF Mono, Menlo, Consolas, monospace',
+  themeVariables: {
+    background:        '#000000',
+    primaryColor:      '#240a0a',
+    primaryTextColor:  '#f0f0f0',
+    primaryBorderColor:'#ff2d2d',
+    secondaryColor:    '#0c0c0c',
+    tertiaryColor:     '#141414',
+    lineColor:         '#303030',
+    textColor:         '#f0f0f0',
+    edgeLabelBackground: '#0c0c0c',
+    nodeBorder:        '#303030',
+    clusterBkg:        '#0c0c0c',
+    clusterBorder:     '#1f1f1f',
+    actorBkg:          '#0c0c0c',
+    actorBorder:       '#ff2d2d',
+    actorTextColor:    '#f0f0f0',
+    actorLineColor:    '#303030',
+    signalColor:       '#bcbcbc',
+    signalTextColor:   '#f0f0f0',
+    labelBoxBkgColor:  '#141414',
+    labelBoxBorderColor:'#303030',
+    labelTextColor:    '#f0f0f0',
+    noteBkgColor:      '#240a0a',
+    noteBorderColor:   '#ff2d2d',
+    noteTextColor:     '#f0f0f0',
+    activationBkgColor:'#240a0a',
+    activationBorderColor:'#ff2d2d',
+  },
+  flowchart: {
+    htmlLabels: true,
+    curve: 'basis',
+    padding: 16,
+  },
+  sequence: {
+    actorMargin: 50,
+    boxMargin: 10,
+    noteMargin: 10,
+    messageMargin: 35,
+  },
+});
+                    `.trim(),
+                },
+            ],
             social: [
                 {
                     icon: "github",

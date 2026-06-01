@@ -38,6 +38,31 @@ short-circuits with `Uncertain(UsernameNotAllowed)` before any HTTP
 request, so the engine doesn't spend a network round-trip on
 syntactically illegal usernames.
 
+<pre class="mermaid">
+flowchart LR
+    Resp[HTTP / browser response] --> S1[Signal 1<br/>StatusFound 200]
+    Resp --> S2[Signal 2<br/>BodyContains username]
+    Resp --> S3[Signal 3<br/>StatusNotFound 404]
+    Resp --> SN[Signal N<br/>...]
+    S1 --> V1{Vote}
+    S2 --> V2{Vote}
+    S3 --> V3{Vote}
+    SN --> VN{Vote}
+    V1 --> Agg[Aggregate<br/>negative-priority]
+    V2 --> Agg
+    V3 --> Agg
+    VN --> Agg
+    Agg -->|Any NotFound vote| NF[Verdict: NotFound]
+    Agg -->|Only Found votes| F[Verdict: Found]
+    Agg -->|No matching votes| U[Verdict: Uncertain]
+</pre>
+
+The negative-priority bias is what lets Adler keep precision high on
+sites that return `200` for every username path: as soon as one signal
+fires `NotFound`, the rest don't get the chance to upgrade it. The
+trade-off is the third bucket — when no rule fires either way, we land
+in `Uncertain` instead of inventing a vote.
+
 The full schema lives at
 [`docs/sites.schema.json`](https://github.com/commit3296/adler/blob/main/docs/sites.schema.json)
 in the repository.
@@ -104,6 +129,84 @@ corrected signature for failing sites by diffing the present/absent
 responses. A nightly GitHub Actions workflow
 (`.github/workflows/doctor.yml`) runs the check across the whole
 registry and flags structural rot.
+
+<pre class="mermaid">
+flowchart TD
+    Start([adler --doctor]) --> ForEach[For each site<br/>in scope]
+    ForEach --> KP[Probe known_present user]
+    ForEach --> KN[Probe random nonsense user<br/>e.g. xkqmwt-2026]
+    KP --> KPV{Verdict?}
+    KN --> KNV{Verdict?}
+    KPV -->|Found| KPok[OK ✓]
+    KPV -->|NotFound or Uncertain| KPbad[Signal mismatch:<br/>known account not detected]
+    KNV -->|NotFound| KNok[OK ✓]
+    KNV -->|Found| KNbad[Signal too broad:<br/>nonsense detected as Found]
+    KPok --> Both{Both halves OK?}
+    KNok --> Both
+    Both -->|Yes| Healthy[Healthy]
+    KPbad --> Diff{--fix mode?}
+    KNbad --> Diff
+    Diff -->|No| Unhealthy[Report unhealthy]
+    Diff -->|Yes| Suggest[Diff present vs absent responses,<br/>print corrected signal]
+</pre>
+
+## When the doctor flags something
+
+Three shapes you'll actually see in `--doctor` output.
+
+### Stale `known_present` user
+
+The site's known-present user account was deleted upstream. The doctor
+probes it, the site says `NotFound`, and the half fails:
+
+```text
+✗ Unhealthy: about.me
+    known_present "blue" → NotFound
+    (rule: status_found [200])
+    nonsense "xkqmwt-2026" → NotFound  (OK)
+    → suggestion: run `--doctor --suggest-known-present --only about.me`
+      to discover a live candidate
+```
+
+Remedy: run `--doctor --suggest-known-present` to probe the candidate
+pool (the site's brand name plus `torvalds` / `octocat` / `admin` / …);
+paste the printed `OVERRIDES` block into your local config.
+
+### Signal too broad (false positive)
+
+A site whose detection rule fires `Found` for *every* username — the
+nonsense user gets a `Found` verdict it shouldn't:
+
+```text
+✗ Unhealthy: forum.example.com
+    known_present "torvalds" → Found  (OK)
+    nonsense "xkqmwt-2026" → Found
+    (rule: status_found [200])
+    → signal too broad: the same status fires for both halves;
+      run with --fix to diff the present and absent responses
+```
+
+Remedy: `adler --doctor --fix --only forum.example.com` diffs the two
+responses and proposes a tighter signal (e.g. a body marker that's
+present for real users but absent on the 404 path the site disguises
+as 200).
+
+### Bot-protected from datacenter IP
+
+Both halves come back `Uncertain` because neither user gets a working
+response from a banned IP:
+
+```text
+~ Inconclusive: instagram.com
+    known_present "instagram" → Uncertain(cloudflare_challenge)
+    nonsense "xkqmwt-2026" → Uncertain(cloudflare_challenge)
+    → tagged `bot-protected`; doctor needs --browser-backend to verify.
+      Re-run with `--doctor --browser-backend local --only instagram`.
+```
+
+Remedy: as the message says. Doctor's `--browser-backend` flag routes
+the bot-protected subset through real Chrome so the diff sees real
+profile pages rather than two identical Cloudflare interstitials.
 
 ## Performance
 

@@ -663,6 +663,38 @@ a.site-title:hover {
     transform: translateY(-1px);
 }
 
+/* ─── Mermaid diagrams ───
+ * Renders inside <pre class="mermaid">…</pre> blocks; Mermaid's runtime
+ * (loaded from astro.config.mjs `head`) replaces the <pre> contents
+ * with an inline SVG. The wrapper styling matches the screenshot
+ * figure aesthetic — hairline frame, bg-nav surface — so a diagram
+ * reads as the same kind of artefact as a captured screen.
+ */
+pre.mermaid {
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 2px;
+    padding: 1.2rem;
+    margin: 1.4rem 0;
+    text-align: center;
+    overflow-x: auto;
+    /* Hide the raw mermaid source flash before the runtime kicks in. */
+    color: transparent;
+}
+pre.mermaid svg {
+    max-width: 100%;
+    height: auto;
+    color: var(--sl-color-text);
+}
+pre.mermaid svg .edgeLabel,
+pre.mermaid svg .edgeLabel rect {
+    background: var(--sl-color-bg-nav) !important;
+    fill: var(--sl-color-bg-nav) !important;
+}
+pre.mermaid svg foreignObject div {
+    color: var(--sl-color-text) !important;
+}
+
 /* ─── screenshot figure ───
  * `<figure class="screenshot">` wraps a Web UI screenshot + caption.
  * Hairline frame, dim caption, lazy-loaded — matches the SPA's

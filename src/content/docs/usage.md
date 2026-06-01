@@ -115,3 +115,104 @@ adler --doctor --suggest-known-present      # find candidate users for stale ent
 ready signal you can drop into the registry (or a local override). A
 nightly GitHub Action runs the doctor across the whole registry and flags
 structural rot.
+
+## When things go wrong
+
+Real shapes for the most common failure modes — copy-and-paste examples
+of what each error looks like so you can match a pattern in your own
+output without guessing.
+
+### Unknown egress name from `POST /api/scan` <span class="since-chip">since v0.11</span>
+
+When the SPA's Advanced filters → Egress section sends an `egress_names`
+entry that's not in the loaded pool, the API rejects at the boundary
+rather than silently dropping to "no egress matched":
+
+```http
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": "unknown_egress",
+  "message": "egress not in pool: us-residential-typo"
+}
+```
+
+CLI equivalent: the `--proxy-pool` TOML is read at startup, so a typo
+in the file surfaces as a config error before any scan runs.
+
+### Site policy needs an egress the pool can't supply
+
+The site declares `access.geo = ["pl"]` (a Polish IP), the pool has
+nothing tagged `pl`. The probe never goes out; the verdict carries the
+reason:
+
+```json
+{
+  "site": "VK",
+  "kind": "uncertain",
+  "reason": "geo_unavailable",
+  "transport": "http",
+  "escalations": 0,
+  "elapsed_ms": 0
+}
+```
+
+Remedy: add a Polish egress to `pool.toml`, or accept the Uncertain (a
+location you can't reach is not evidence the account is absent).
+
+### Named session missing
+
+The site declares `access.session = "ig"` and you didn't pass
+`--sessions <file>` (or the file doesn't have an `[ig]` block). Same
+pattern, different reason:
+
+```json
+{
+  "site": "Instagram",
+  "kind": "uncertain",
+  "reason": "session_required",
+  "transport": "http",
+  "escalations": 0,
+  "elapsed_ms": 0
+}
+```
+
+Remedy: copy the Instagram cookies from your browser's devtools into
+`[ig]` block of `sessions.toml`.
+
+### Deadline exceeded mid-scan
+
+You set `--deadline-secs 30` on a 2,000-site scan and ran out of time.
+Sites that didn't get their turn surface with:
+
+```json
+{
+  "site": "Wattpad",
+  "kind": "uncertain",
+  "reason": "deadline",
+  "elapsed_ms": 0
+}
+```
+
+Remedy: narrow with `--tag` / `--only`, raise `--deadline-secs`, or
+raise `--concurrency`.
+
+### Browser budget exhausted
+
+`--browser-budget 5` set, more than five `bot-protected` sites in the
+scope:
+
+```json
+{
+  "site": "Threads",
+  "kind": "uncertain",
+  "reason": "browser_budget",
+  "elapsed_ms": 0
+}
+```
+
+The first five `bot-protected` sites went through the browser
+successfully; the rest fall back to this honest Uncertain rather than
+silently dropping out of the scan. Remedy: raise `--browser-budget` or
+`--exclude-tag bot-protected` to skip the subset entirely.

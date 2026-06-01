@@ -12,15 +12,40 @@ flips an honest `Uncertain(reason)` into a real `Found` / `NotFound` on
 the hard subset of the registry — Cloudflare-walled, TLS-fingerprinted,
 geo-restricted, login-walled.
 
-The router picks one *primary* transport per site based on the registry's
-`protection` tags and the `bot-protected` tag:
+## The route a probe takes
 
-- Pre-tagged `bot-protected` → headless browser (the only thing that sees
-  past their JS / login wall).
-- `protection: tls-fingerprint` exactly → in-process `wreq` Chrome 134
-  handshake (much cheaper than a real browser).
-- Everything else → plain HTTP through the default egress, or a pool-
-  matched egress when the site declares an `access` policy.
+Every probe walks the same decision tree. Pre-flight checks fire first
+(username regex, session resolution); then the router picks a primary
+transport based on the site's `protection` tags; an `Uncertain` reason
+that a browser could resolve triggers automatic escalation; an
+operator-policy `Uncertain` (geo / session / robots / etc.) is kept as-is.
+
+<pre class="mermaid">
+flowchart TD
+    Start([Probe a site]) --> Regex{regex_check<br/>matches?}
+    Regex -->|No| UnameU[Uncertain<br/>username_not_allowed]
+    Regex -->|Yes| Session{access.session<br/>named?}
+    Session -->|Yes, missing| SessU[Uncertain<br/>session_required]
+    Session -->|None or supplied| Bot{tagged<br/>bot-protected?}
+    Bot -->|Yes, browser ok| BrowserPath[Browser fetch]
+    Bot -->|Yes, no browser| AlwaysU[Uncertain<br/>always]
+    Bot -->|No| TLS{protection<br/>= tls-fingerprint?}
+    TLS -->|Yes + impersonate built| ImpPath[Impersonate fetch<br/>wreq + Chrome 134]
+    TLS -->|No| Egress{access policy<br/>satisfied by pool?}
+    Egress -->|No matching egress| GeoU[Uncertain<br/>geo_unavailable]
+    Egress -->|Yes| HttpPath[HTTP fetch<br/>through chosen egress]
+    HttpPath --> Verdict{Verdict?}
+    ImpPath --> Verdict
+    BrowserPath --> Final([Verdict])
+    Verdict -->|Found / NotFound| Final
+    Verdict -->|Uncertain CF / 429| Esc{escalation<br/>budget left?}
+    Verdict -->|Other Uncertain| Final
+    Esc -->|No| Final
+    Esc -->|Yes, browser ok| EscFetch[Escalated browser fetch]
+    EscFetch --> Final
+</pre>
+
+The primitives the tree refers to are documented per-section below.
 
 When the cheap transport returns an `Uncertain` reason a browser would
 resolve (Cloudflare interstitial, 429-style rate-limit), the router
@@ -251,7 +276,32 @@ Cloudflare's JS challenge.
 Every outcome stamps which transport actually produced its verdict, so
 downstream tools (the doctor, the bench harness, the web UI, your own
 JSON consumers) can tell the difference between a `Found` that came back
-from raw HTTP and a `Found` that required a browser fetch:
+from raw HTTP and a `Found` that required a browser fetch.
+
+<pre class="mermaid">
+sequenceDiagram
+    participant R as Router
+    participant H as HTTP
+    participant B as Browser backend
+    participant O as CheckOutcome
+    participant U as Consumer<br/>(SPA / JSON / bench)
+    Note over R: Cheap transport first
+    R->>H: fetch(site, headers)
+    H-->>R: response
+    alt Found / NotFound
+        R->>O: stamp transport=http, escalations=0
+    else Uncertain(cloudflare / 429)
+        Note over R: Escalation budget ok?
+        R->>B: retry via browser
+        B-->>R: response
+        R->>O: stamp transport=browser, escalations=1
+    else Other Uncertain
+        R->>O: stamp transport=http, reason
+    end
+    O-->>U: outcome with telemetry
+</pre>
+
+Two concrete shapes:
 
 ```json
 {
