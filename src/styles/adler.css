@@ -1,0 +1,216 @@
+/*
+ * Adler theme for Starlight.
+ *
+ * Mirrors the design tokens of the SolidJS web UI shipped with
+ * `adler --web` (`adler-server/web/src/ui/tokens.css` in the main
+ * repo) so the docs site reads as part of the same product, not a
+ * vanilla Starlight install with the project's content pasted in.
+ *
+ * Key choices, in case future-you wonders why:
+ *   - pitch-black surface (`#000`) with two elevation steps for
+ *     sidebar / nav / inline-code backgrounds;
+ *   - red accent `#ff2d2d` — Adler is named for Irene Adler, "the
+ *     Woman", and the red is the brand throughout the SPA;
+ *   - 2px corner radius everywhere (the SPA is almost rectangular —
+ *     the tool's aesthetic is "terminal-adjacent", not "consumer SaaS");
+ *   - JetBrains Mono for code, system sans (Inter / SF / Segoe UI)
+ *     for prose — same stacks the SPA uses;
+ *   - `color-scheme: dark` everywhere — the theme switcher is hidden
+ *     by a sibling component override (Adler SPA is dark-only).
+ */
+
+:root,
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* ─── color: surfaces ─── */
+    --sl-color-bg: #000;
+    --sl-color-bg-nav: #0c0c0c;
+    --sl-color-bg-sidebar: #0c0c0c;
+    --sl-color-bg-inline-code: #141414;
+    --sl-color-bg-accent: #240a0a;
+
+    /* ─── color: text ─── */
+    --sl-color-text: #f0f0f0;
+    --sl-color-text-accent: #ff5757;
+    --sl-color-text-invert: #fff;
+    --sl-color-white: #f0f0f0;
+    --sl-color-gray-1: #f0f0f0;
+    --sl-color-gray-2: #bcbcbc;
+    --sl-color-gray-3: #7e7e7e;
+    --sl-color-gray-4: #303030;
+    --sl-color-gray-5: #1f1f1f;
+    --sl-color-gray-6: #141414;
+    --sl-color-black: #000;
+
+    /* ─── color: hairlines ─── */
+    --sl-color-hairline: #1f1f1f;
+    --sl-color-hairline-light: #1f1f1f;
+    --sl-color-hairline-shade: #303030;
+
+    /* ─── color: accent ─── */
+    --sl-color-accent-low: #240a0a;
+    --sl-color-accent: #ff2d2d;
+    --sl-color-accent-high: #ff5757;
+
+    /* ─── color: semantic (asides, callouts) ─── */
+    --sl-color-green-low: #0e2614;
+    --sl-color-green: #3dd06f;
+    --sl-color-green-high: #5bdf85;
+    --sl-color-orange-low: #2a1d09;
+    --sl-color-orange: #f4b14c;
+    --sl-color-orange-high: #f7c373;
+    --sl-color-red-low: #240a0a;
+    --sl-color-red: #ff2d2d;
+    --sl-color-red-high: #ff5757;
+    --sl-color-blue-low: #102035;
+    --sl-color-blue: #4a90e2;
+    --sl-color-blue-high: #7eb1ed;
+    --sl-color-purple-low: #1b1228;
+    --sl-color-purple: #b478f0;
+    --sl-color-purple-high: #c794f4;
+
+    /* ─── code blocks (Shiki) ─── */
+    --sl-color-bg-code: #0c0c0c;
+
+    /* ─── typography ─── */
+    --sl-font:
+        ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter",
+        "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+    --sl-font-system:
+        ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter",
+        "Segoe UI", system-ui, "Helvetica Neue", Arial, sans-serif;
+    --sl-font-system-mono:
+        ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas,
+        monospace;
+
+    /* ─── corner radius — match the SPA's 2 px ─── */
+    --sl-shadow-sm: 0 1px 0 rgba(255, 45, 45, 0.05);
+    --sl-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --sl-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+/*
+ * Even when the user (or OS) is in "light" mode we want the Adler
+ * aesthetic to land — the SPA itself doesn't have a light mode, so a
+ * mid-grey docs surface would clash with the product. The
+ * `[data-theme="light"]` block below mirrors the dark variables.
+ */
+:root[data-theme="light"] {
+    color-scheme: dark;
+    --sl-color-bg: #000;
+    --sl-color-bg-nav: #0c0c0c;
+    --sl-color-bg-sidebar: #0c0c0c;
+    --sl-color-bg-inline-code: #141414;
+    --sl-color-bg-accent: #240a0a;
+    --sl-color-text: #f0f0f0;
+    --sl-color-text-accent: #ff5757;
+    --sl-color-text-invert: #fff;
+    --sl-color-hairline: #1f1f1f;
+    --sl-color-hairline-light: #1f1f1f;
+    --sl-color-hairline-shade: #303030;
+    --sl-color-accent-low: #240a0a;
+    --sl-color-accent: #ff2d2d;
+    --sl-color-accent-high: #ff5757;
+}
+
+/* ─── 2-px corner radius across the chrome ───
+ * Starlight's defaults are softer (4–8 px). Override the controls we
+ * actually see so the docs read like the SPA's button / chip / modal
+ * vocabulary instead of a generic SaaS feel.
+ */
+.action,
+.button,
+button,
+input[type="search"],
+.sl-link-card,
+.starlight-aside,
+.expressive-code .frame,
+pre.astro-code,
+code:not(pre code) {
+    border-radius: 2px !important;
+}
+
+/* ─── selection ─── */
+::selection {
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-text);
+}
+
+/* ─── inline code: tighten the box to match SPA chips ─── */
+:not(pre) > code {
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg-inline-code);
+    color: var(--sl-color-text);
+    font-family: var(--sl-font-system-mono);
+}
+
+/* ─── splash-page hero polish ───
+ * The landing uses Starlight's splash template; the hero's CTA row
+ * carries the marketing weight. Tighten the buttons to the SPA's
+ * primary / secondary look.
+ */
+.hero .action {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+.hero .action.primary {
+    background: var(--sl-color-accent);
+    color: #fff;
+    border-color: var(--sl-color-accent);
+}
+.hero .action.primary:hover {
+    background: #ff5050;
+    border-color: #ff5050;
+}
+.hero .action.secondary {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    border-color: var(--sl-color-hairline-shade);
+}
+.hero .action.secondary:hover {
+    background: #181818;
+    border-color: var(--sl-color-gray-3);
+}
+
+/* ─── sidebar accent rail on active item ───
+ * Starlight's default highlight is a left bar. Keep it but switch to
+ * the accent red so the nav reads as Adler-branded.
+ */
+.sidebar-content [aria-current="page"] {
+    color: var(--sl-color-text-accent);
+    background: var(--sl-color-bg-accent);
+    border-left: 2px solid var(--sl-color-accent);
+}
+
+/* ─── tables: the compare table on the landing carries credibility,
+ * so make sure it renders with the SPA's hairline aesthetic ─── */
+.sl-markdown-content table {
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 2px;
+    overflow: hidden;
+}
+.sl-markdown-content table th,
+.sl-markdown-content table td {
+    border-bottom: 1px solid var(--sl-color-hairline);
+    border-right: 1px solid var(--sl-color-hairline);
+}
+.sl-markdown-content table th:last-child,
+.sl-markdown-content table td:last-child {
+    border-right: none;
+}
+.sl-markdown-content table tr:last-child td {
+    border-bottom: none;
+}
+.sl-markdown-content table th {
+    background: var(--sl-color-bg-nav);
+    color: var(--sl-color-text);
+    font-weight: 600;
+}
+
+/* ─── focus ring: match the SPA's red 3-px halo ─── */
+:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 1px;
+}

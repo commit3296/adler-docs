@@ -23,6 +23,14 @@ export default defineConfig({
             title: "Adler",
             description:
                 "OSINT username search across ~3,000 sites — built for operators reaching Cloudflare-walled, TLS-fingerprinted, geo-restricted, login-walled sites.",
+            // Match the SPA's design system (`adler-server/web/src/ui/tokens.css`):
+            // pitch-black surface, red brand accent, 2 px corners, JetBrains
+            // Mono + system sans. The empty ThemeSelect override hides the
+            // light/dark switcher — the SPA is dark-only, the docs follow.
+            customCss: ["./src/styles/adler.css"],
+            components: {
+                ThemeSelect: "./src/components/ThemeSelect.astro",
+            },
             social: [
                 {
                     icon: "github",
