@@ -20,7 +20,11 @@ export default defineConfig({
     },
     integrations: [
         starlight({
-            title: "Adler",
+            // Caps, monospace, tracked out — the same brand mark the SPA
+            // uses in its top-bar (`adler-server/web/src/styles.css`
+            // `.logo-link`). The CSS in `src/styles/adler.css` enforces
+            // the font / letter-spacing / colour to match exactly.
+            title: "ADLER",
             description:
                 "OSINT username search across ~3,000 sites — built for operators reaching Cloudflare-walled, TLS-fingerprinted, geo-restricted, login-walled sites.",
             // Match the SPA's design system (`adler-server/web/src/ui/tokens.css`):

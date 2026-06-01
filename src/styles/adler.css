@@ -434,17 +434,37 @@ code:not(pre code) {
 }
 
 /* ─── header / top bar styling ───
- * Match the SPA's TopBar: thin bottom hairline, tighter brand label.
+ * Match the SPA's TopBar: thin bottom hairline, brand mark in the
+ * same monospace / red / tracked-out style as the SPA's `.logo-link`.
+ *
+ * Reference (adler-server/web/src/styles.css):
+ *   .logo-link {
+ *       font-family: var(--mono);
+ *       font-size: 1.1rem;
+ *       font-weight: 700;
+ *       letter-spacing: 0.18em;
+ *       color: var(--red);    // #ff2d2d
+ *   }
+ *   .logo-link:hover { background: var(--bg-elev); }
  */
 header.header {
     border-bottom: 1px solid var(--sl-color-hairline);
     background: var(--sl-color-bg);
 }
-.site-title {
+.site-title,
+a.site-title {
+    font-family: var(--sl-font-system-mono);
+    font-size: 1.1rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.18em;
+    color: var(--sl-color-accent);
+    padding: 0.2rem 0.4rem;
+    border-radius: 2px;
+    transition: background 80ms;
 }
-.site-title:hover {
+.site-title:hover,
+a.site-title:hover {
+    background: var(--sl-color-bg-inline-code);
     color: var(--sl-color-accent);
 }
 
