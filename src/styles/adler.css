@@ -185,11 +185,64 @@ code:not(pre code) {
 }
 
 /* ─── tables: the compare table on the landing carries credibility,
- * so make sure it renders with the SPA's hairline aesthetic ─── */
+ * so make sure it renders with the SPA's hairline aesthetic ───
+ *
+ * Wide tables (the compare table is 6 cols, site-registry tables are
+ * 3–4 cols with long cell text) need to *scroll horizontally* on
+ * narrow viewports rather than overflow the content area or get
+ * clipped. `display: block` lets us put `overflow-x: auto` on the
+ * <table> itself without wrapping it in a div via a remark plugin.
+ *
+ * Trade-off: cells lose their `<table>` natural-fit sizing and only
+ * grow as wide as their content; on wide viewports the table no
+ * longer stretches to fill the column. `min-width: 100%` keeps it
+ * full-width when the content fits.
+ */
 .sl-markdown-content table {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
     border: 1px solid var(--sl-color-hairline-shade);
     border-radius: 2px;
-    overflow: hidden;
+    /* iOS momentum scrolling on the table itself when it overflows. */
+    -webkit-overflow-scrolling: touch;
+    /* Visual cue that the table is scrollable: a faint right-edge
+     * shadow appears only when content overflows. Uses CSS-only
+     * `background-attachment: local` so it follows the scroll. */
+    background:
+        linear-gradient(to right, var(--sl-color-bg) 30%, transparent) 0 0 /
+            40px 100% no-repeat local,
+        linear-gradient(to left, var(--sl-color-bg) 30%, transparent) 100% 0 /
+            40px 100% no-repeat local,
+        radial-gradient(
+                farthest-side at 0 50%,
+                rgba(255, 45, 45, 0.18),
+                transparent
+            )
+            0 0 / 14px 100% no-repeat scroll,
+        radial-gradient(
+                farthest-side at 100% 50%,
+                rgba(255, 45, 45, 0.18),
+                transparent
+            )
+            100% 0 / 14px 100% no-repeat scroll;
+}
+/* Style the horizontal scrollbar so it doesn't look like a default
+ * browser scrollbar pasted onto our dark theme. */
+.sl-markdown-content table::-webkit-scrollbar {
+    height: 6px;
+}
+.sl-markdown-content table::-webkit-scrollbar-track {
+    background: var(--sl-color-bg);
+}
+.sl-markdown-content table::-webkit-scrollbar-thumb {
+    background: var(--sl-color-hairline-shade);
+    border-radius: 2px;
+}
+.sl-markdown-content table::-webkit-scrollbar-thumb:hover {
+    background: var(--sl-color-accent);
 }
 .sl-markdown-content table th,
 .sl-markdown-content table td {
