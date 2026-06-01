@@ -23,7 +23,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 To opt into the TLS-fingerprint impersonation transport, enable the
 `impersonate` feature (build-time deps: `cmake`, a C++ compiler,
-`libclang` — see [Access engine → TLS-fingerprint impersonation](/adler-docs/access-engine/#tls-fingerprint-impersonation)):
+`libclang` — see [Access engine → TLS-fingerprint impersonation](/access-engine/#tls-fingerprint-impersonation)):
 
 ```toml
 [dependencies]

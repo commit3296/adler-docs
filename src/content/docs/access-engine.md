@@ -173,7 +173,7 @@ browser backend keeps its own egress (e.g. Browserbase's residential
 IPs); `--proxy-pool` routes the raw-HTTP path.
 
 When `adler --web` is running, the SPA can [restrict a single scan to a
-subset of the pool by name](/adler-docs/web-ui/#per-scan-egress-subset),
+subset of the pool by name](/web-ui/#per-scan-egress-subset),
 without re-launching the server.
 
 ## Sessions (reach login-walled sites)
@@ -275,5 +275,5 @@ In the second example, the cheap path returned
 `Uncertain(cloudflare_challenge)` and the router escalated to the browser
 backend; one escalation budget slot was consumed. Tools surfacing the
 field include the web UI (a small `transport` chip on each
-[`ResultRow`](/adler-docs/web-ui/#result-rows)), `adler --explain`, and
+[`ResultRow`](/web-ui/#result-rows)), `adler --explain`, and
 the JSON / NDJSON output formats.

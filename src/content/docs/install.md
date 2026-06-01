@@ -14,7 +14,7 @@ cargo binstall adler-cli            # https://github.com/cargo-bins/cargo-binsta
 `cargo binstall` ships impersonate-enabled binaries on x86_64-linux,
 both macOS targets, and Windows. The `aarch64-unknown-linux-gnu` build
 ships *without* the impersonate feature — see [TLS-fingerprint
-impersonation](/adler-docs/access-engine/#tls-fingerprint-impersonation)
+impersonation](/access-engine/#tls-fingerprint-impersonation)
 for why and how to opt back in.
 
 ## From source (`cargo install`)
@@ -54,14 +54,14 @@ cargo install --path adler-cli
 - For `--browser-backend local`: Chrome or Chromium reachable on `PATH`.
 - For `--browser-backend browserbase`: `ADLER_BROWSERBASE_API_KEY` and
   `ADLER_BROWSERBASE_PROJECT_ID` environment variables; see
-  [Access engine → Browser backend](/adler-docs/access-engine/#browser-backend).
+  [Access engine → Browser backend](/access-engine/#browser-backend).
 
 ## What ships
 
 The installed binary is `adler`. The library
 ([`adler-core`](https://crates.io/crates/adler-core)) is published
 separately for embedding the engine in your own tools — see
-[Embedding](/adler-docs/embedding/).
+[Embedding](/embedding/).
 
 | Crate         | Kind | Purpose                                                  |
 | ------------- | ---- | -------------------------------------------------------- |

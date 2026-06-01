@@ -2,8 +2,8 @@
 
 User-facing documentation for [Adler](https://github.com/commit3296/adler),
 an OSINT username-search tool. Built with [Astro
-Starlight](https://starlight.astro.build/) and deployed to GitHub Pages
-at <https://commit3296.github.io/adler-docs/>.
+Starlight](https://starlight.astro.build/) and deployed to **Cloudflare
+Pages** at <https://adler-docs.pages.dev/>.
 
 The `adler` Rust API reference lives on
 [docs.rs](https://docs.rs/adler-core); this site covers the user-facing
@@ -16,7 +16,8 @@ troubleshooting).
 .
 ├── public/                       # static assets served verbatim
 ├── src/
-│   ├── assets/                   # images embedded via Markdown
+│   ├── components/
+│   │   └── ThemeSelect.astro     # empty override → hides theme switcher
 │   ├── content/docs/             # the actual pages, slugs map to URLs
 │   │   ├── index.mdx
 │   │   ├── install.md
@@ -27,19 +28,38 @@ troubleshooting).
 │   │   ├── embedding.md
 │   │   ├── site-registry.md
 │   │   └── faq.md
+│   ├── styles/
+│   │   └── adler.css             # Starlight var overrides → SPA theme
 │   └── content.config.ts
-├── astro.config.mjs              # sidebar + site / base path config
-└── .github/workflows/deploy.yml  # GH Pages build + deploy on push
+├── astro.config.mjs              # sidebar + site config
+├── .nvmrc                        # Node 22 — Astro 6.x minimum
+└── package.json
 ```
 
 ## Local development
 
 ```bash
 npm ci
-npm run dev      # http://localhost:4321/adler-docs/
+npm run dev      # http://localhost:4321/
 npm run build    # produces dist/
 npm run preview  # serve dist/ for a final sanity-check before push
 ```
+
+## Deploy
+
+Cloudflare Pages owns build + deploy. Settings:
+
+| Setting               | Value                |
+| --------------------- | -------------------- |
+| Production branch     | `main`               |
+| Framework preset      | Astro                |
+| Build command         | `npm run build`      |
+| Build output directory| `dist`               |
+| Node version          | `22` (`.nvmrc`)      |
+
+Every push to `main` triggers a production build; every PR gets a
+preview deployment with its own URL — so doc changes can be reviewed
+visually before merge.
 
 ## Contributing
 

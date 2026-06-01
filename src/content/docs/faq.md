@@ -14,7 +14,7 @@ you can tell *why* it was inconclusive (`cloudflare_challenge`,
 
 For sites that *systematically* sit behind Cloudflare or rate-limit edges
 without being pre-tagged `bot-protected`, [Automatic
-escalation](/adler-docs/access-engine/#automatic-escalation) will retry
+escalation](/access-engine/#automatic-escalation) will retry
 through the browser backend on its own — no manual intervention needed.
 
 ## Why does Adler report fewer Found accounts than Sherlock or Maigret?
@@ -26,7 +26,7 @@ negatives.
 
 Check Adler's `Uncertain` bucket: most of the apparent "missing" hits are
 there, with a *reason*. Resolve the wall (browser, residential IP,
-sessions) and they flip to `Found`. See [Access engine](/adler-docs/access-engine/)
+sessions) and they flip to `Found`. See [Access engine](/access-engine/)
 for the toolkit.
 
 ## How do I scan Instagram / X (Twitter) / Threads?
@@ -35,7 +35,7 @@ They're tagged `bot-protected` — plain HTTP gets a login wall. Use
 `--browser-backend local` (free, local Chrome) or `--browser-backend
 browserbase` (paid, residential cloud). For Instagram specifically,
 supplying a session via `--sessions` lets you reach the authenticated
-profile (see [Access engine → Sessions](/adler-docs/access-engine/#sessions-reach-login-walled-sites)).
+profile (see [Access engine → Sessions](/access-engine/#sessions-reach-login-walled-sites)).
 
 ## `--proxy` vs `--proxy-pool` — which do I want?
 
@@ -44,7 +44,7 @@ per-site: the registry declares "this site needs a UK residential IP",
 Adler picks a matching egress from the pool; sites without a constraint
 use the default. Mix them freely.
 
-See [Access engine → Egress pool](/adler-docs/access-engine/#egress-pool-geo-routing)
+See [Access engine → Egress pool](/access-engine/#egress-pool-geo-routing)
 for the TOML format and the geo / IP-type matching rules.
 
 ## A site's signature is stale — how do I fix it?
@@ -54,7 +54,7 @@ for the TOML format and the geo / IP-type matching rules.
 corrected signature. Paste it into a local override or open a PR.
 
 The [`--doctor` workflow is described in
-detail](/adler-docs/site-registry/#validating-signatures) on the site
+detail](/site-registry/#validating-signatures) on the site
 registry page.
 
 ## Is it legal to use sock-puppet accounts for `--sessions`?
@@ -90,7 +90,7 @@ catching the long tail.
   surprise escalations.
 - You want strict cheap-path semantics for a CI-style gate.
 
-See [Access engine → Automatic escalation](/adler-docs/access-engine/#automatic-escalation)
+See [Access engine → Automatic escalation](/access-engine/#automatic-escalation)
 for what triggers escalation and what reasons are deliberately ignored.
 
 ## My web UI is on `0.0.0.0`, what should I worry about?

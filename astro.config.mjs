@@ -3,13 +3,13 @@ import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import remarkGfm from "remark-gfm";
 
-// Adler documentation site. Hosted on GitHub Pages at
-//   https://commit3296.github.io/adler-docs/
-// so we have to set both `site` and `base` — Starlight uses them to
-// resolve internal links, the search index, and the Edit-this-page URL.
+// Adler documentation site. Hosted on Cloudflare Pages at
+//   https://adler-docs.pages.dev/
+// (and a future custom domain, e.g. https://docs.adler.dev).
+// Cloudflare Pages serves at the project root, so no `base` prefix is
+// needed — internal links use `/install/`, `/access-engine/`, etc.
 export default defineConfig({
-    site: "https://commit3296.github.io",
-    base: "/adler-docs",
+    site: "https://adler-docs.pages.dev",
     // Astro applies remark-gfm to .md files by default, but the MDX
     // integration does NOT inherit the default plugin list — so tables /
     // task lists / autolinks silently render as plain text in `.mdx`

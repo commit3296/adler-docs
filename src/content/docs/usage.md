@@ -7,7 +7,7 @@ description: Common CLI flags grouped by intent — filtering, output, network, 
 knob. Text output shows Found and Uncertain rows by default and hides
 NotFound — pass `--all` for the full list. Results stream into a terminal
 as they resolve; piped output is collected and ordered. For a browser
-view, pass `--web` (see [Web UI](/adler-docs/web-ui/)).
+view, pass `--web` (see [Web UI](/web-ui/)).
 
 Exit codes: `0` something found, `1` nothing found, `2` error.
 
@@ -51,15 +51,15 @@ adler --tor alice                        # local Tor SOCKS proxy
 adler --rotate-ua alice                  # rotate User-Agent per request
 ```
 
-See [Access engine → Egress pool](/adler-docs/access-engine/#egress-pool-geo-routing)
+See [Access engine → Egress pool](/access-engine/#egress-pool-geo-routing)
 for how `--proxy-pool` interacts with the registry's per-site `access`
 policies, and [Access engine →
-Sessions](/adler-docs/access-engine/#sessions-reach-login-walled-sites)
+Sessions](/access-engine/#sessions-reach-login-walled-sites)
 for the session TOML format.
 
 For TLS-fingerprint-blocked sites, build with `--features impersonate`
 (see [Access engine → TLS-fingerprint
-impersonation](/adler-docs/access-engine/#tls-fingerprint-impersonation)).
+impersonation](/access-engine/#tls-fingerprint-impersonation)).
 
 ## Browser & cache
 
@@ -78,8 +78,8 @@ adler --cache-clear                          # drop the cache
 ```
 
 Cache lives at `~/.cache/adler/`. The browser backend and automatic
-escalation are described in [Access engine → Browser backend](/adler-docs/access-engine/#browser-backend)
-and [Access engine → Automatic escalation](/adler-docs/access-engine/#automatic-escalation).
+escalation are described in [Access engine → Browser backend](/access-engine/#browser-backend)
+and [Access engine → Automatic escalation](/access-engine/#automatic-escalation).
 
 ## Batch & enrichment
 
