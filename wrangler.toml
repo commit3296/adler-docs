@@ -1,0 +1,13 @@
+# Cloudflare Pages config — pins the project as a *static* Pages site
+# so the CI does **not** try to wrap the Astro output in a Worker
+# (the auto-detect path runs `astro add cloudflare` and rebuilds in
+# SSR mode, which prerender-faults on Node.js modules — see commit
+# `9d25b6a`'s build log for the gnarly stack trace).
+#
+# `pages_build_output_dir` is the canonical signal: it tells wrangler
+# "the build already produced a static asset directory; deploy it,
+# don't bundle anything".
+
+name = "adler-docs"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-01"
