@@ -3,6 +3,8 @@ title: Install
 description: cargo binstall, cargo install, build from source.
 ---
 
+<p class="audience-badge audience-operator">For operators · running scans</p>
+
 ## From `cargo binstall` (recommended)
 
 Pre-built binary from the GitHub release — instant, no compile:

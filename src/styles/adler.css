@@ -519,6 +519,128 @@ a.site-title:hover {
     text-decoration-color: var(--sl-color-accent);
 }
 
+/* ─── audience badge ───
+ * Small chip rendered as raw HTML at the top of each docs page so the
+ * reader knows in 2 seconds whether a page is meant for them.
+ *
+ * Usage in .md (no MDX needed):
+ *   <p class="audience-badge audience-operator">For operators · running scans and debugging walls</p>
+ *
+ * Three variants map to the SPA's semantic colour palette:
+ *   operator    → accent red    (the canonical user, runs scans)
+ *   embedder    → semantic blue (Rust dev wiring adler-core)
+ *   contributor → semantic amber (adds sites, debugs signals)
+ *
+ * Visual: monospace, hairline border, accent-bg-soft, 2 px corners —
+ * reads as a status chip on a terminal, not a Material badge.
+ */
+.audience-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 2px;
+    border: 1px solid;
+    margin: 0 0 1.4rem;
+}
+.audience-badge::before {
+    content: "▸";
+    font-size: 0.7em;
+    opacity: 0.7;
+}
+.audience-operator {
+    color: var(--sl-color-accent-high);
+    background: var(--sl-color-accent-low);
+    border-color: var(--sl-color-accent);
+}
+.audience-embedder {
+    color: var(--sl-color-blue-high);
+    background: var(--sl-color-blue-low);
+    border-color: var(--sl-color-blue);
+}
+.audience-contributor {
+    color: var(--sl-color-orange-high);
+    background: var(--sl-color-orange-low);
+    border-color: var(--sl-color-orange);
+}
+/* When a page applies to more than one audience, badges land in a row. */
+.audience-badge + .audience-badge {
+    margin-left: 0.4rem;
+}
+
+/* ─── since-version chip ───
+ * Inline marker for features that landed in a specific Adler release.
+ * Reads as a quiet annotation so the surrounding prose isn't broken up.
+ *
+ * Usage:
+ *   `--escalation-budget` <span class="since-chip">since v0.10</span> caps escalations to ...
+ */
+.since-chip {
+    display: inline-block;
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0.05rem 0.4rem;
+    border-radius: 2px;
+    border: 1px solid var(--sl-color-hairline-shade);
+    background: var(--sl-color-bg-inline-code);
+    color: var(--sl-color-gray-2);
+    vertical-align: middle;
+    margin: 0 0.15rem;
+    /* Lift slightly so it sits between the surrounding cap-height and
+     * x-height of the prose font without disturbing line-height. */
+    transform: translateY(-1px);
+}
+
+/* ─── screenshot figure ───
+ * `<figure class="screenshot">` wraps a Web UI screenshot + caption.
+ * Hairline frame, dim caption, lazy-loaded — matches the SPA's
+ * `.results-list` aesthetic without competing with it.
+ */
+figure.screenshot {
+    margin: 1.6rem 0;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 2px;
+    background: var(--sl-color-bg-nav);
+    overflow: hidden;
+}
+figure.screenshot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--sl-color-hairline);
+}
+figure.screenshot figcaption {
+    padding: 0.6rem 0.9rem;
+    font-family: var(--sl-font);
+    font-size: 0.85rem;
+    color: var(--sl-color-gray-2);
+    line-height: 1.5;
+}
+figure.screenshot figcaption code {
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.78rem;
+    background: var(--sl-color-bg);
+    padding: 0.05rem 0.35rem;
+    border-radius: 2px;
+    color: var(--sl-color-text);
+}
+
+/* ─── FAQ-style page bold-first answer ───
+ * The FAQ uses an H2 per question; the first paragraph after each H2
+ * is the one-line TL;DR answer. Bold it so it's the first thing the
+ * eye lands on — the explanation paragraph after is for the reader
+ * who needs the context.
+ */
+.sl-markdown-content h2:not(:where(.not-content *)) + p > strong:first-child {
+    color: var(--sl-color-text);
+}
+
 /* ─── focus ring: match the SPA's red 3-px halo ─── */
 :focus-visible {
     outline: 2px solid var(--sl-color-accent);

@@ -3,6 +3,8 @@ title: Embedding (Rust library)
 description: Drive adler-core from your own Rust code — minimal worked example plus the notable builder knobs and per-site fields you'll actually touch.
 ---
 
+<p class="audience-badge audience-embedder">For embedders · Rust</p>
+
 `adler-core` is the runtime-agnostic engine that powers the CLI; it's
 published separately on [crates.io](https://crates.io/crates/adler-core)
 so you can embed username detection in your own Rust tools — a Discord

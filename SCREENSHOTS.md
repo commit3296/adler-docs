@@ -1,0 +1,120 @@
+# Screenshots brief
+
+The Web UI page renders pretty short without visual proof of the SPA.
+The five screenshots below are what's needed to make the page actually
+explain itself in 2 seconds instead of 200 words.
+
+I can't take these from the shell — Starlight can resolve the images
+once they're on disk, but the actual capture needs a browser. Please
+take them with the framing below and drop the WebP files into
+`public/screenshots/`. The Web UI page already references these paths
+with hard-coded `<img>` tags, so once the files land in place they'll
+render on the next CF Pages deploy automatically.
+
+## Setup
+
+1. Build a fresh `adler` with the feature flags you want pictured:
+   ```bash
+   cargo install --path adler-cli --features impersonate
+   ```
+2. Launch the server with a non-trivial config so the Access modal has
+   something to show:
+   ```bash
+   adler --web \
+       --proxy-pool ~/.config/adler/pool.toml \
+       --sessions ~/.config/adler/sessions.toml \
+       --browser-backend local
+   ```
+   If you don't have a pool / sessions file handy, copy the examples
+   from `/access-engine/#egress-pool-geo-routing` and
+   `/access-engine/#sessions-reach-login-walled-sites`.
+3. Open `http://127.0.0.1:8080/` in your browser.
+
+## Capture settings
+
+- **Viewport**: `1280 × 800`. The SPA layout settles cleanly at this
+  size — wider and the right-side gutter dominates; narrower and the
+  sidebar wraps.
+- **DPR / scale**: `2x` (Retina-quality) if your tool supports it; the
+  Starlight `<img>` tag below uses `srcset` to halve display size.
+- **Format**: `webp`, quality ~85. Matches the rest of the docs site
+  asset pipeline.
+- **Naming**: see filenames below; use these exact names so the page
+  references resolve.
+- **Where to drop them**: `public/screenshots/`. The docs site serves
+  `public/` at root, so the files end up at
+  `https://adler-docs.pages.dev/screenshots/<name>.webp`.
+
+## Frames
+
+### 1. `01-live-scan.webp` — Live scan view
+
+> A scan in progress, mid-stream, with the live SSE outcomes painting
+> the categorised result list. This is the canonical "Adler in action"
+> shot.
+
+- Enter a real username with broad coverage (e.g. `blue` or `torvalds`)
+  into the search box.
+- Press Enter.
+- Capture **while the spinner is still going**, when roughly 30–60%
+  of rows have arrived. Visible Found / Uncertain rows in a couple of
+  category groups (dev, social, …) is the look.
+
+### 2. `02-result-row-detail.webp` — Result row with transport chip
+
+> A close-up of one or two `ResultRow`s with the `transport` chip
+> visible — proves the v0.10 telemetry exists and shows what `browser*`
+> looks like (the escalated case).
+
+- Run a scan against a username that hits a Cloudflare-walled site
+  (`blue` or any username on Reddit / Patreon usually triggers it).
+- Wait for the scan to finish so escalations have settled.
+- Scroll to a row where the `transport` chip reads `browser*` (small
+  red-orange chip in the meta column).
+- Capture the row plus the one above and below for context.
+
+### 3. `03-history-modal.webp` — History drawer
+
+> The right-side drawer listing recent scans. Establishes that scans
+> persist and previous runs are reachable.
+
+- Run two or three scans against different usernames so the drawer
+  has at least 3–5 entries.
+- Click the **History** (clock) icon in the top bar.
+- Capture the open drawer with the modal-backdrop dimming the rest.
+
+### 4. `04-diff-view.webp` — Side-by-side scan diff
+
+> The compare-with-previous view. Hardest to set up — requires two
+> scans of the same username spaced out.
+
+- Run `adler --web` with persistence enabled (default is
+  `~/.cache/adler/scans/`).
+- Scan one username (`torvalds`).
+- Modify some accounts (or wait until something changes) — easier:
+  scan a username where one site flips Uncertain → Found or
+  Found → NotFound (e.g. after enabling `--browser-backend`).
+- In the History drawer, arm the first scan as "compare from", then
+  click "diff" on the second scan.
+- Capture the side-by-side view at `#/diff/<a>/<b>` with at least one
+  row in each of Added / Removed / Flipped.
+
+### 5. `05-access-modal.webp` — Access engine read-only modal
+
+> The shield icon's modal showing the loaded `--proxy-pool` (name,
+> country, kind — never URLs) and `--sessions` (names only). Proves
+> the v0.11 access view and the no-secrets-on-the-wire design.
+
+- Boot the server with `--proxy-pool` + `--sessions` (per setup above).
+- Click the **shield** icon in the top bar.
+- Capture the modal open.
+
+## After upload
+
+Once the files land in `public/screenshots/`:
+
+1. Commit + push.
+2. CF Pages rebuilds; `adler-docs.pages.dev/web-ui/` renders the
+   images inline.
+3. If a path mismatch makes one 404, the `<img>` tag's `alt` text falls
+   back gracefully — not blocking, but worth fixing.

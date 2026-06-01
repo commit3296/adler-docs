@@ -3,6 +3,8 @@ title: Quickstart
 description: First scan in under a minute.
 ---
 
+<p class="audience-badge audience-operator">For operators · running scans</p>
+
 ## Your first scan
 
 After [installing](/install/), scan one username across the

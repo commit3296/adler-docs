@@ -3,6 +3,8 @@ title: Access engine
 description: How Adler reaches sites that block plain HTTP — browser backend, TLS-fingerprint impersonation, per-site egress pool, operator-supplied sessions, and automatic escalation.
 ---
 
+<p class="audience-badge audience-operator">For operators · running scans</p>
+
 The access engine is the cluster of routing primitives that lets Adler
 reach sites a plain HTTP client can't see. Together they're how Adler
 flips an honest `Uncertain(reason)` into a real `Found` / `NotFound` on
@@ -97,7 +99,7 @@ on the bot-protected subset, but on the rest of the registry they'd add
 latency for no recall gain — which is why routing is opt-in and
 tag-driven, not blanket.
 
-## Automatic escalation
+## Automatic escalation <span class="since-chip">since v0.10</span>
 
 The pre-tag routing above handles sites the registry has *already* marked
 as `bot-protected`. It can't help with the long tail — sites that look
@@ -173,10 +175,10 @@ browser backend keeps its own egress (e.g. Browserbase's residential
 IPs); `--proxy-pool` routes the raw-HTTP path.
 
 When `adler --web` is running, the SPA can [restrict a single scan to a
-subset of the pool by name](/web-ui/#per-scan-egress-subset),
+subset of the pool by name](/web-ui/#per-scan-egress-subset) <span class="since-chip">since v0.11</span>,
 without re-launching the server.
 
-## Sessions (reach login-walled sites)
+## Sessions (reach login-walled sites) <span class="since-chip">since v0.10</span>
 
 Some sites only show a profile to a logged-in user (Instagram, Threads,
 Reddit's JSON). A site can declare `access.session = "<name>"` in the
@@ -210,7 +212,7 @@ Header values are secrets — redacted from logs, never written to scan
 output. Using a sock-puppet account may breach a site's ToS; that's an
 operator decision within your engagement's scope.
 
-## TLS-fingerprint impersonation
+## TLS-fingerprint impersonation <span class="since-chip">since v0.10</span>
 
 Some sites read the TLS handshake's JA3 / JA4 fingerprint and serve a
 block page to anything that doesn't look like a real browser — `rustls`

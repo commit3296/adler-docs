@@ -3,6 +3,9 @@ title: Site registry
 description: Where the ~3,000-site registry comes from, how detection signals work, and how to validate / heal stale signatures.
 ---
 
+<p class="audience-badge audience-contributor">For contributors · registry</p>
+<p class="audience-badge audience-operator">For operators · context</p>
+
 ## Lineage
 
 The default registry (`adler-core/data/sites.json`, ~2.5k sites) is

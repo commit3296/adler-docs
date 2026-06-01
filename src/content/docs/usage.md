@@ -3,6 +3,8 @@ title: Usage
 description: Common CLI flags grouped by intent — filtering, output, network, browser, cache, batch, and enrichment.
 ---
 
+<p class="audience-badge audience-operator">For operators · running scans</p>
+
 `adler <username>` scans the embedded registry; everything else is a
 knob. Text output shows Found and Uncertain rows by default and hides
 NotFound — pass `--all` for the full list. Results stream into a terminal

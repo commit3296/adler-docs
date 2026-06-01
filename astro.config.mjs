@@ -74,7 +74,7 @@ export default defineConfig({
                 },
                 {
                     label: "Help",
-                    items: [{ slug: "faq" }],
+                    items: [{ slug: "faq" }, { slug: "glossary" }],
                 },
             ],
             // Keep the footer terse — operators care about content,
