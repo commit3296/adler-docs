@@ -209,6 +209,243 @@ code:not(pre code) {
     font-weight: 600;
 }
 
+/* ─── tables: row-hover + subtle zebra-striping
+ * Mirrors the SPA's `--color-bg-row-hover: #181818` ResultRow hover
+ * state. Helps scanning long tables (the compare table, the doc
+ * site-registry tables) without adding chrome weight.
+ */
+.sl-markdown-content table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.012);
+}
+.sl-markdown-content table tbody tr:hover {
+    background: #181818;
+}
+
+/* ─── code blocks (Expressive Code) ───
+ * Starlight ships Expressive Code with a frame that has a chrome bar,
+ * a copy button, and (optionally) a file name. Default theming reads
+ * as generic-dark; tighten to the SPA's terminal-adjacent aesthetic.
+ */
+.expressive-code {
+    --ec-brdRad: 2px;
+    --ec-brdCol: var(--sl-color-hairline-shade);
+    --ec-frm-edBg: #0c0c0c;
+    --ec-frm-edTabBarBg: #141414;
+    --ec-frm-edTabBarBrdBtmCol: var(--sl-color-hairline-shade);
+    --ec-frm-edTabActBg: #0c0c0c;
+    --ec-frm-edTabActBrdCol: var(--sl-color-accent);
+    --ec-frm-edTabActFg: var(--sl-color-text);
+    --ec-frm-edTabInactFg: var(--sl-color-gray-2);
+    --ec-frm-trmBg: #0c0c0c;
+    --ec-frm-trmTitleBg: #141414;
+    --ec-frm-trmTitleFg: var(--sl-color-gray-2);
+    --ec-frm-trmTitleBrdBtmCol: var(--sl-color-hairline-shade);
+    --ec-brdWdt: 1px;
+    --ec-tm-selBg: var(--sl-color-accent-low);
+    --ec-tm-selBrdCol: var(--sl-color-accent);
+    --ec-uiSelBg: var(--sl-color-accent-low);
+    --ec-uiSelFg: var(--sl-color-text);
+}
+.expressive-code .frame {
+    box-shadow: none;
+}
+.expressive-code .frame pre {
+    background: #0c0c0c !important;
+}
+.expressive-code .copy button {
+    border-radius: 2px !important;
+    border-color: var(--sl-color-hairline-shade) !important;
+    background: var(--sl-color-bg) !important;
+    color: var(--sl-color-gray-2) !important;
+    transition:
+        background 80ms,
+        color 80ms,
+        border-color 80ms;
+}
+.expressive-code .copy button:hover {
+    color: var(--sl-color-accent) !important;
+    border-color: var(--sl-color-accent) !important;
+}
+.expressive-code .copy button.copied {
+    color: var(--sl-color-green-high) !important;
+    border-color: var(--sl-color-green) !important;
+}
+
+/* ─── asides / callouts ───
+ * Starlight asides come in note / tip / caution / danger. The default
+ * uses a vertical coloured rail + a tinted background. Mirror that but
+ * with the SPA's hairline + accent-bg pattern so callouts read as
+ * Adler chips at section-scale, not vendor-themed alert bars.
+ */
+.starlight-aside {
+    border-radius: 2px;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-left-width: 2px;
+    background: var(--sl-color-bg-nav);
+    padding: 0.85rem 1rem;
+}
+.starlight-aside__title {
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--sl-color-gray-2);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.starlight-aside--note {
+    border-left-color: var(--sl-color-blue);
+}
+.starlight-aside--note .starlight-aside__title {
+    color: var(--sl-color-blue-high);
+}
+.starlight-aside--tip {
+    border-left-color: var(--sl-color-green);
+}
+.starlight-aside--tip .starlight-aside__title {
+    color: var(--sl-color-green-high);
+}
+.starlight-aside--caution {
+    border-left-color: var(--sl-color-orange);
+}
+.starlight-aside--caution .starlight-aside__title {
+    color: var(--sl-color-orange-high);
+}
+.starlight-aside--danger {
+    border-left-color: var(--sl-color-accent);
+}
+.starlight-aside--danger .starlight-aside__title {
+    color: var(--sl-color-accent-high);
+}
+
+/* ─── link cards / CardGrid cards on splash ───
+ * The four `What you get` cards on the landing use Starlight's Card +
+ * CardGrid. Default theming is a vanilla bordered box. Add a subtle
+ * red-accent hover state that mirrors the SPA's `ResultRow` hover —
+ * cards read as interactive elements rather than passive panels.
+ */
+.sl-link-card,
+.card {
+    background: var(--sl-color-bg-nav);
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 2px;
+    transition:
+        border-color 120ms,
+        background 120ms,
+        transform 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.sl-link-card:hover,
+.card:hover {
+    border-color: var(--sl-color-accent);
+    background: #141414;
+    transform: translateY(-1px);
+}
+.sl-link-card .title,
+.card .title {
+    color: var(--sl-color-text);
+    font-weight: 600;
+}
+.sl-link-card:hover .title,
+.card:hover .title {
+    color: var(--sl-color-accent-high);
+}
+
+/* ─── sidebar navigation polish ───
+ * The active-page rail is in the variables block above. This adds:
+ *   - hover state for inactive items (subtle bg tint)
+ *   - mono caps for group labels (mirrors the SPA's section labels)
+ *   - tighter vertical rhythm so the nav reads as a compact terminal
+ *     tree rather than a roomy SaaS menu.
+ */
+.sidebar-content a:not([aria-current="page"]) {
+    color: var(--sl-color-gray-2);
+    transition:
+        color 80ms,
+        background 80ms;
+}
+.sidebar-content a:not([aria-current="page"]):hover {
+    color: var(--sl-color-text);
+    background: var(--sl-color-bg-nav);
+}
+.sidebar-content .group-label,
+.sidebar-content summary > span {
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--sl-color-gray-3);
+}
+
+/* ─── header / top bar styling ───
+ * Match the SPA's TopBar: thin bottom hairline, tighter brand label.
+ */
+header.header {
+    border-bottom: 1px solid var(--sl-color-hairline);
+    background: var(--sl-color-bg);
+}
+.site-title {
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+.site-title:hover {
+    color: var(--sl-color-accent);
+}
+
+/* ─── pagination links at bottom of page ───
+ * Prev / next chips at the foot of each page. Match the SPA's
+ * Chip styling — thin border, accent-bg-soft hover.
+ */
+.pagination-links a {
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-radius: 2px;
+    background: var(--sl-color-bg-nav);
+    transition:
+        border-color 80ms,
+        background 80ms;
+}
+.pagination-links a:hover {
+    border-color: var(--sl-color-accent);
+    background: var(--sl-color-bg-accent);
+}
+.pagination-links a span:last-child {
+    color: var(--sl-color-text);
+}
+
+/* ─── markdown content typography refinements ───
+ * Tighten H2 with a subtle hairline underline that reads as a section
+ * delimiter, and give H3+ a tonal hierarchy that doesn't lean on size
+ * alone.
+ */
+.sl-markdown-content h2:not(:where(.not-content *)) {
+    border-bottom: 1px solid var(--sl-color-hairline);
+    padding-bottom: 0.4rem;
+    margin-top: 2.4rem;
+}
+.sl-markdown-content h3:not(:where(.not-content *)) {
+    color: var(--sl-color-text);
+    margin-top: 1.8rem;
+}
+.sl-markdown-content blockquote {
+    border-left: 2px solid var(--sl-color-accent);
+    background: var(--sl-color-bg-nav);
+    padding: 0.4rem 1rem;
+    border-radius: 0 2px 2px 0;
+}
+.sl-markdown-content a:not(:where(.not-content *, .sl-link-card *)) {
+    color: var(--sl-color-text-accent);
+    text-decoration-color: var(--sl-color-hairline-shade);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 80ms;
+}
+.sl-markdown-content a:not(:where(.not-content *, .sl-link-card *)):hover {
+    text-decoration-color: var(--sl-color-accent);
+}
+
 /* ─── focus ring: match the SPA's red 3-px halo ─── */
 :focus-visible {
     outline: 2px solid var(--sl-color-accent);
