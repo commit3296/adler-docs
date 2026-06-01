@@ -4,6 +4,7 @@ description: How Adler reaches sites that block plain HTTP — browser backend, 
 ---
 
 <p class="audience-badge audience-operator">For operators · running scans</p>
+<span class="type-chip type-explanation">Explanation</span>
 
 The access engine is the cluster of routing primitives that lets Adler
 reach sites a plain HTTP client can't see. Together they're how Adler

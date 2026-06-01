@@ -4,6 +4,7 @@ description: cargo binstall, cargo install, build from source.
 ---
 
 <p class="audience-badge audience-operator">For operators · running scans</p>
+<span class="type-chip type-howto">How-to</span>
 
 ## From `cargo binstall` (recommended)
 

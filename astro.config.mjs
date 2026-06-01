@@ -46,35 +46,50 @@ export default defineConfig({
                 baseUrl:
                     "https://github.com/commit3296/adler-docs/edit/main/",
             },
-            // PR-reviewable sidebar — links by slug so renames in
-            // src/content/docs/ surface as build errors rather than
-            // silent 404s.
+            // Sidebar organised by Diátaxis (Tutorials / How-to /
+            // Reference / Explanation / Help). Slugs stay flat — no
+            // subdirectory renames — so cross-links from external
+            // sources (the main repo README, docs.rs intra-crate
+            // links, open issues) keep resolving.
+            //
+            // Link by slug so renames in src/content/docs/ surface as
+            // build errors rather than silent 404s.
             sidebar: [
                 {
-                    label: "Getting started",
+                    label: "Tutorials",
                     items: [
-                        { slug: "install" },
                         { slug: "quickstart" },
+                        { slug: "first-scan" },
                     ],
                 },
                 {
-                    label: "Guides",
+                    label: "How-to guides",
                     items: [
-                        { slug: "usage" },
-                        { slug: "access-engine" },
+                        { slug: "install" },
                         { slug: "web-ui" },
+                        { slug: "embedding" },
                     ],
                 },
                 {
                     label: "Reference",
                     items: [
-                        { slug: "embedding" },
+                        { slug: "usage" },
                         { slug: "site-registry" },
                     ],
                 },
                 {
+                    label: "Explanation",
+                    items: [
+                        { slug: "honest-verdicts" },
+                        { slug: "access-engine" },
+                    ],
+                },
+                {
                     label: "Help",
-                    items: [{ slug: "faq" }, { slug: "glossary" }],
+                    items: [
+                        { slug: "faq" },
+                        { slug: "glossary" },
+                    ],
                 },
             ],
             // Keep the footer terse — operators care about content,

@@ -4,6 +4,7 @@ description: Drive adler-core from your own Rust code — minimal worked example
 ---
 
 <p class="audience-badge audience-embedder">For embedders · Rust</p>
+<span class="type-chip type-howto">How-to</span>
 
 `adler-core` is the runtime-agnostic engine that powers the CLI; it's
 published separately on [crates.io](https://crates.io/crates/adler-core)

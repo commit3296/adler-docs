@@ -6,6 +6,7 @@ description: Adler-specific terminology, in one place. Use the alphabetical inde
 <p class="audience-badge audience-operator">For operators · scanning</p>
 <p class="audience-badge audience-embedder">For embedders · Rust</p>
 <p class="audience-badge audience-contributor">For contributors · registry</p>
+<span class="type-chip type-reference">Reference</span>
 
 Single source of truth for Adler-specific terminology. Definitions here
 override any informal usage you might see in commit messages, PR

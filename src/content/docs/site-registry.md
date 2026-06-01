@@ -5,6 +5,7 @@ description: Where the ~3,000-site registry comes from, how detection signals wo
 
 <p class="audience-badge audience-contributor">For contributors · registry</p>
 <p class="audience-badge audience-operator">For operators · context</p>
+<span class="type-chip type-reference">Reference</span>
 
 ## Lineage
 

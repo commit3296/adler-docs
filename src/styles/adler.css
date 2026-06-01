@@ -572,6 +572,72 @@ a.site-title:hover {
     margin-left: 0.4rem;
 }
 
+/* ─── Diátaxis type chip ───
+ * Orthogonal to the audience badge: declares the *kind* of content on
+ * the page, so the reader knows what reading mode to enter.
+ *
+ *   Tutorial    — learning-oriented, follow in order (green)
+ *   How-to      — task-oriented, jump to the section you need (orange)
+ *   Reference   — lookup-oriented, scan with Ctrl-F (blue)
+ *   Explanation — understanding-oriented, narrative (purple)
+ *
+ * Usage:
+ *   <span class="type-chip type-tutorial">Tutorial</span>
+ *
+ * Sits inline next to the page title in the first paragraph block,
+ * or in the audience-badge row.
+ */
+.type-chip {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0.22rem 0.6rem;
+    border-radius: 2px;
+    border: 1px solid;
+    margin: 0 0.3rem 1.4rem 0;
+}
+.type-chip::before {
+    content: "▦";
+    font-size: 0.7em;
+    margin-right: 0.4rem;
+    opacity: 0.7;
+}
+.type-tutorial {
+    color: var(--sl-color-green-high);
+    background: var(--sl-color-green-low);
+    border-color: var(--sl-color-green);
+}
+.type-tutorial::before {
+    content: "▤";
+}
+.type-howto {
+    color: var(--sl-color-orange-high);
+    background: var(--sl-color-orange-low);
+    border-color: var(--sl-color-orange);
+}
+.type-howto::before {
+    content: "▶";
+}
+.type-reference {
+    color: var(--sl-color-blue-high);
+    background: var(--sl-color-blue-low);
+    border-color: var(--sl-color-blue);
+}
+.type-reference::before {
+    content: "≣";
+}
+.type-explanation {
+    color: var(--sl-color-purple-high);
+    background: var(--sl-color-purple-low);
+    border-color: var(--sl-color-purple);
+}
+.type-explanation::before {
+    content: "★";
+}
+
 /* ─── since-version chip ───
  * Inline marker for features that landed in a specific Adler release.
  * Reads as a quiet annotation so the surrounding prose isn't broken up.

@@ -4,6 +4,7 @@ description: Common questions about Adler's behaviour, troubleshooting, and oper
 ---
 
 <p class="audience-badge audience-operator">For operators · scanning</p>
+<span class="type-chip type-howto">How-to</span>
 
 Each question opens with a one-sentence answer in bold so you can scan
 the FAQ in 30 seconds. Read the paragraph after it if you need the

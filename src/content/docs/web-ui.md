@@ -4,6 +4,7 @@ description: The SolidJS SPA bundled with adler — live SSE streaming, history,
 ---
 
 <p class="audience-badge audience-operator">For operators · running scans</p>
+<span class="type-chip type-howto">How-to</span>
 
 `adler --web` boots a small in-process HTTP server and serves a SolidJS
 SPA from the same binary — no separate frontend deployment, no extra
