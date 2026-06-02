@@ -197,6 +197,15 @@ code:not(pre code) {
  * grow as wide as their content; on wide viewports the table no
  * longer stretches to fill the column. `min-width: 100%` keeps it
  * full-width when the content fits.
+ *
+ * Earlier iterations layered four background gradients on `<table>`
+ * (two 40px-wide bg "covers" + two 14px-wide red "scroll cues") to
+ * fake an iOS-style fade at the scroll edges. The covers bled onto
+ * the first / last column even when the table wasn't scrollable —
+ * the first column appeared to have no left padding, the last got
+ * visually clipped on the right. Dropped entirely: the styled
+ * horizontal scrollbar plus explicit cell padding give clear
+ * affordance without overlaying content.
  */
 .sl-markdown-content table {
     display: block;
@@ -208,26 +217,6 @@ code:not(pre code) {
     border-radius: 2px;
     /* iOS momentum scrolling on the table itself when it overflows. */
     -webkit-overflow-scrolling: touch;
-    /* Visual cue that the table is scrollable: a faint right-edge
-     * shadow appears only when content overflows. Uses CSS-only
-     * `background-attachment: local` so it follows the scroll. */
-    background:
-        linear-gradient(to right, var(--sl-color-bg) 30%, transparent) 0 0 /
-            40px 100% no-repeat local,
-        linear-gradient(to left, var(--sl-color-bg) 30%, transparent) 100% 0 /
-            40px 100% no-repeat local,
-        radial-gradient(
-                farthest-side at 0 50%,
-                rgba(255, 45, 45, 0.18),
-                transparent
-            )
-            0 0 / 14px 100% no-repeat scroll,
-        radial-gradient(
-                farthest-side at 100% 50%,
-                rgba(255, 45, 45, 0.18),
-                transparent
-            )
-            100% 0 / 14px 100% no-repeat scroll;
 }
 /* Style the horizontal scrollbar so it doesn't look like a default
  * browser scrollbar pasted onto our dark theme. */
@@ -246,8 +235,22 @@ code:not(pre code) {
 }
 .sl-markdown-content table th,
 .sl-markdown-content table td {
+    /* Explicit padding — Starlight's default isn't reliably applied
+     * once <table> is display:block, and without it cell content
+     * butts up against the table border at the first / last column.
+     * 0.6rem vertical keeps row height comfortable; 0.9rem horizontal
+     * matches the .panel padding used in the SPA.
+     */
+    padding: 0.6rem 0.9rem;
     border-bottom: 1px solid var(--sl-color-hairline);
     border-right: 1px solid var(--sl-color-hairline);
+    /* Don't force narrow cells to wrap on every space — the
+     * horizontal scroll handles overflow when content needs the room.
+     * Allow wrapping where the content explicitly contains long prose
+     * (cells > 32ch fall back to natural word-wrap thanks to the next
+     * rule).
+     */
+    vertical-align: top;
 }
 .sl-markdown-content table th:last-child,
 .sl-markdown-content table td:last-child {
@@ -260,6 +263,7 @@ code:not(pre code) {
     background: var(--sl-color-bg-nav);
     color: var(--sl-color-text);
     font-weight: 600;
+    text-align: left;
 }
 
 /* ─── tables: row-hover + subtle zebra-striping
