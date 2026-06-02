@@ -1,0 +1,47 @@
+name: Links
+
+on:
+  pull_request:
+    paths:
+      - "src/content/docs/**"
+      - "src/**.astro"
+      - "README.md"
+      - "lychee.toml"
+      - ".github/workflows/links.yml"
+  schedule:
+    # Weekly sweep — catch link rot in the docs even when no PR is open.
+    # Sunday 04:00 UTC: cheap window, before the working week.
+    - cron: "0 4 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Run lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Config (excludes, retries, UA, accept-codes) lives in
+          # lychee.toml at the repo root and is auto-loaded.
+          args: >-
+            'src/content/docs/**/*.md'
+            'src/content/docs/**/*.mdx'
+            'README.md'
+          fail: true
+          # Job summary on the run; PR failures show up in the check.
+          jobSummary: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

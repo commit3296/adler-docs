@@ -1,0 +1,59 @@
+# lychee.toml — link-checker config for adler-docs.
+#
+# Tuning notes:
+#   - Internal Starlight links (`/access-engine/`, `/glossary/#…`) are
+#     served as relative paths at build time and resolved against the
+#     site origin at runtime. We pass `--base` from the workflow only
+#     when we want to verify them against a real deployment; in CI we
+#     just check external HTTP(S) links.
+#   - shields.io is rate-limited and occasionally 503s — retries +
+#     cache absorb the noise without false-failing PRs.
+
+cache = true
+max_cache_age = "7d"
+no_progress = true
+
+# Retries: shields.io / docs.rs / crates.io hiccup; one retry is cheap.
+max_retries = 2
+retry_wait_time = 3
+
+# Don't probe local file:// schemes or mailto: targets.
+exclude_path = ["dist/", "node_modules/", ".astro/"]
+
+exclude = [
+    # Site-internal pages — Starlight resolves these at runtime, not
+    # at file scan time. We rely on Astro's build to catch broken
+    # internal links (it errors on dangling `<a href="…">` against
+    # the routing table).
+    "^/.*",
+
+    # The CHANGELOG / specific issue / commit links are rolling — they
+    # rot intentionally. Don't fail a docs PR on those.
+    "^https://github\\.com/.*/issues/\\d+$",
+    "^https://github\\.com/.*/pull/\\d+$",
+
+    # shields.io endpoint badges return JSON / SVG with 200 even when
+    # the upstream is degraded; checking is noise.
+    "^https://img\\.shields\\.io/",
+
+    # crates.io's anti-bot 403s lychee from a fresh runner IP. The
+    # crate URLs in embedding.md / install.md are well-known and
+    # extremely unlikely to break — not worth false-positives.
+    "^https://crates\\.io/",
+
+    # docs.rs sometimes 502s — the canonical reference is stable.
+    "^https://docs\\.rs/",
+]
+
+# Some servers reject the default lychee UA; impersonate Firefox for
+# the GET fallback so we get a real response.
+user_agent = "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+
+# A short timeout keeps the job snappy; the retries cover real network
+# blips.
+timeout = 20
+
+# Accept HTTP 200, 206, 301, 302, 308, 403 (some sites cloak under
+# bot-protection but still respond to a UA-spoofed request — we don't
+# want to fail on those).
+accept = ["200..=299", "301", "302", "308", "403", "429"]

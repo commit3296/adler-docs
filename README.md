@@ -1,5 +1,9 @@
 # adler-docs
 
+[![Cloudflare Pages](https://img.shields.io/github/deployments/commit3296/adler-docs/Production?label=cloudflare%20pages&logo=cloudflarepages&logoColor=white)](https://adler-docs.pages.dev/)
+[![Links](https://github.com/commit3296/adler-docs/actions/workflows/links.yml/badge.svg)](https://github.com/commit3296/adler-docs/actions/workflows/links.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 User-facing documentation for [Adler](https://github.com/commit3296/adler),
 an OSINT username-search tool. Built with [Astro
 Starlight](https://starlight.astro.build/) and deployed to **Cloudflare
