@@ -6,6 +6,20 @@ description: How Adler reaches sites that block plain HTTP — browser backend, 
 <p class="audience-badge audience-operator">For operators · running scans</p>
 <span class="type-chip type-explanation">Explanation</span>
 
+<aside class="tldr">
+
+Five primitives that convert `Uncertain` into real verdicts:
+
+- **Browser backend** — local Chrome / Browserbase for `bot-protected` sites.
+- **Automatic escalation** — retry through the browser on `cloudflare_challenge` / `rate_limited`.
+- **Egress pool** — TOML of per-country proxies for sites with geo-restricted `access` policies.
+- **Sessions** — operator-supplied logged-in headers for login-walled sites.
+- **TLS-fingerprint impersonation** — Chrome 134 BoringSSL handshake via the `impersonate` feature.
+
+Each `CheckOutcome` stamps `transport` and `escalations` so you can see which path produced the verdict.
+
+</aside>
+
 The access engine is the cluster of routing primitives that lets Adler
 reach sites a plain HTTP client can't see. Together they're how Adler
 flips an honest `Uncertain(reason)` into a real `Found` / `NotFound` on

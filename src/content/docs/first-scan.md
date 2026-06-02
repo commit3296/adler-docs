@@ -6,6 +6,20 @@ description: A guided tutorial that takes you from a fresh install to a useful s
 <p class="audience-badge audience-operator">For operators · running scans</p>
 <span class="type-chip type-tutorial">Tutorial</span>
 
+<aside class="tldr">
+
+Seven steps, ~15 minutes:
+
+1. **Install** with `cargo binstall adler-cli`.
+2. **Run** `adler torvalds` and read the streaming output.
+3. **Understand** the three verdicts — `Found`, `NotFound`, `Uncertain(reason)`.
+4. **Aggregate** Uncertain reasons with `--format ndjson | jq` to find the dominant cause.
+5. **Remedy** the dominant cause — usually a residential proxy via `--proxy socks5://...`.
+6. **Compare** before / after by diffing the NDJSON dumps.
+7. **Automate** with `--watch` or the bundled web UI (`--web`).
+
+</aside>
+
 This tutorial takes you end-to-end on your first scan — installing
 Adler, running it, reading the output, hitting `Uncertain`, fixing
 `Uncertain`, watching the verdict improve, and saving the workflow for

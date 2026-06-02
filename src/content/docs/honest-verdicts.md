@@ -7,6 +7,15 @@ description: Why Adler returns Uncertain(reason) instead of guessing — the pri
 <p class="audience-badge audience-embedder">For embedders · Rust</p>
 <span class="type-chip type-explanation">Explanation</span>
 
+<aside class="tldr">
+
+- Adler returns **three verdicts** — `Found`, `NotFound`, `Uncertain(reason)` — not the binary model Sherlock / Maigret use.
+- An `Uncertain` says *the site refused to tell us, and here's why* — categorically different from `NotFound` (*the site told us this account doesn't exist*).
+- Binary-verdict tools inflate recall by counting walls as `NotFound`. Adler doesn't — and that's the whole point.
+- The [access engine](/access-engine/) is the toolkit that converts `Uncertain` into a binary verdict *when the operator opts in*; surviving `Uncertain`s are genuinely missing data.
+
+</aside>
+
 Adler reports three verdicts per probe — `Found`, `NotFound`, and
 `Uncertain(reason)` — instead of the binary `Found` / `NotFound` model
 most username-search tools use. This page exists because that single

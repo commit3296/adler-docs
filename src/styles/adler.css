@@ -739,6 +739,54 @@ figure.screenshot figcaption code {
     color: var(--sl-color-text);
 }
 
+/* ─── TL;DR callout ───
+ * `<aside class="tldr">` near the top of long pages. Compact summary
+ * the reader can absorb before deciding whether to read the rest.
+ * Hairline frame + red rail + monospace caps label match the SPA's
+ * .panel/.evidence-drawer hierarchy.
+ */
+.sl-markdown-content aside.tldr {
+    margin: 1.4rem 0 1.8rem;
+    padding: 0.9rem 1.1rem 0.95rem 1.15rem;
+    border: 1px solid var(--sl-color-hairline-shade);
+    border-left: 2px solid var(--sl-color-accent);
+    border-radius: 2px;
+    background: var(--sl-color-bg-nav);
+}
+.sl-markdown-content aside.tldr::before {
+    content: "TL;DR";
+    display: block;
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: var(--sl-color-accent);
+    margin-bottom: 0.45rem;
+}
+.sl-markdown-content aside.tldr > p:first-of-type {
+    margin-top: 0;
+}
+.sl-markdown-content aside.tldr > p:last-child,
+.sl-markdown-content aside.tldr > ul:last-child,
+.sl-markdown-content aside.tldr > ol:last-child {
+    margin-bottom: 0;
+}
+.sl-markdown-content aside.tldr ul,
+.sl-markdown-content aside.tldr ol {
+    margin: 0.4rem 0;
+    padding-left: 1.2rem;
+}
+.sl-markdown-content aside.tldr li + li {
+    margin-top: 0.2rem;
+}
+.sl-markdown-content aside.tldr code {
+    font-family: var(--sl-font-system-mono);
+    font-size: 0.82em;
+    background: var(--sl-color-bg);
+    padding: 0.05rem 0.3rem;
+    border-radius: 2px;
+}
+
 /* ─── focus ring: match the SPA's red 3-px halo ─── */
 :focus-visible {
     outline: 2px solid var(--sl-color-accent);

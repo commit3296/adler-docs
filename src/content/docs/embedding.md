@@ -6,6 +6,15 @@ description: Drive adler-core from your own Rust code — minimal worked example
 <p class="audience-badge audience-embedder">For embedders · Rust</p>
 <span class="type-chip type-howto">How-to</span>
 
+<aside class="tldr">
+
+- **Rust:** add `adler-core = "0.10"`, build a `Client`, call `executor::run` — minimal example below.
+- **Other languages:** shell out to `adler --format ndjson <username>` and parse one outcome per line. Python / Go / Node examples in [Driving Adler from other languages](#driving-adler-from-other-languages).
+- **Knobs you'll actually touch:** `Client::builder()` (timeout, retries, browser, escalation), `Registry::filter` (tags / regex), `Site::access` (egress / session policy).
+- **Telemetry:** every `CheckOutcome` carries `transport` + `escalations` — preserve them through your pipeline so consumers can distinguish `Found via browser` from `Found via raw HTTP`.
+
+</aside>
+
 `adler-core` is the runtime-agnostic engine that powers the CLI; it's
 published separately on [crates.io](https://crates.io/crates/adler-core)
 so you can embed username detection in your own Rust tools — a Discord
@@ -60,6 +69,125 @@ async fn main() -> adler_core::Result<()> {
     Ok(())
 }
 ```
+
+## Driving Adler from other languages
+
+`adler-core` is Rust-only on crates.io, but the CLI emits NDJSON — one
+JSON outcome per line, flushed as each probe resolves. Any language with
+a subprocess API can stream that, which is the recommended bridge for
+Python / Go / Node embedders. Shape per line:
+
+```json
+{"site":"GitHub","kind":"found","transport":"http","escalations":0,"url":"https://github.com/torvalds","elapsed_ms":124}
+{"site":"Reddit","kind":"uncertain","reason":"cloudflare_challenge","transport":"http","escalations":0,"elapsed_ms":410}
+```
+
+The CLI exits `0` if any site resolved `Found`, `1` if none did, `2` on
+error. Honour those rather than parsing stderr.
+
+### Python
+
+```python
+import json
+import subprocess
+
+def scan(username: str):
+    proc = subprocess.Popen(
+        ["adler", "--format", "ndjson", username],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        line = line.strip()
+        if not line:
+            continue
+        yield json.loads(line)
+    proc.wait()
+    if proc.returncode == 2:
+        raise RuntimeError("adler exited with error")
+
+for outcome in scan("torvalds"):
+    if outcome["kind"] == "found":
+        print(f"{outcome['site']}: {outcome['url']}")
+    elif outcome["kind"] == "uncertain":
+        print(f"{outcome['site']}: uncertain ({outcome['reason']})")
+```
+
+### Go
+
+```go
+package main
+
+import (
+    "bufio"
+    "encoding/json"
+    "fmt"
+    "log"
+    "os/exec"
+)
+
+type Outcome struct {
+    Site         string `json:"site"`
+    Kind         string `json:"kind"`
+    Reason       string `json:"reason,omitempty"`
+    Transport    string `json:"transport,omitempty"`
+    Escalations  int    `json:"escalations,omitempty"`
+    URL          string `json:"url,omitempty"`
+    ElapsedMs    int    `json:"elapsed_ms"`
+}
+
+func main() {
+    cmd := exec.Command("adler", "--format", "ndjson", "torvalds")
+    stdout, err := cmd.StdoutPipe()
+    if err != nil {
+        log.Fatal(err)
+    }
+    if err := cmd.Start(); err != nil {
+        log.Fatal(err)
+    }
+    scanner := bufio.NewScanner(stdout)
+    for scanner.Scan() {
+        var o Outcome
+        if err := json.Unmarshal(scanner.Bytes(), &o); err != nil {
+            continue
+        }
+        if o.Kind == "found" {
+            fmt.Printf("%s: %s\n", o.Site, o.URL)
+        }
+    }
+    _ = cmd.Wait()
+}
+```
+
+### Node.js
+
+```javascript
+import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
+
+async function* scan(username) {
+    const child = spawn("adler", ["--format", "ndjson", username]);
+    const rl = createInterface({ input: child.stdout, crlfDelay: Infinity });
+    for await (const line of rl) {
+        if (!line.trim()) continue;
+        yield JSON.parse(line);
+    }
+    await new Promise((resolve) => child.on("close", resolve));
+}
+
+for await (const o of scan("torvalds")) {
+    if (o.kind === "found") {
+        console.log(`${o.site}: ${o.url}`);
+    } else if (o.kind === "uncertain") {
+        console.log(`${o.site}: uncertain (${o.reason})`);
+    }
+}
+```
+
+The same NDJSON shape comes out of the `POST /api/scan` SSE stream from
+`adler --web` — useful if you'd rather drive Adler over HTTP than as a
+subprocess (see [Web UI → JSON API](/web-ui/#json-api)).
 
 ## Notable knobs
 
