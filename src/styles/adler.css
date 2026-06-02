@@ -573,8 +573,14 @@ a.site-title:hover {
 }
 .audience-badge::before {
     content: "▸";
-    font-size: 0.7em;
-    opacity: 0.7;
+    /* `1em` matches the surrounding text height — Unicode glyphs at
+     * the previous 0.7em landed under 9 px and rendered as pixel
+     * mush. Slight opacity drop keeps it from out-competing the
+     * text without hiding it.
+     */
+    font-size: 1em;
+    line-height: 1;
+    opacity: 0.85;
 }
 .audience-operator {
     color: var(--sl-color-accent-high);
@@ -625,9 +631,13 @@ a.site-title:hover {
 }
 .type-chip::before {
     content: "▦";
-    font-size: 0.7em;
+    /* Same fix as `.audience-badge::before` — 0.7em rendered the
+     * type glyphs (▤ ▶ ≣ ★) below 9 px where they lose all detail.
+     */
+    font-size: 1em;
+    line-height: 1;
     margin-right: 0.4rem;
-    opacity: 0.7;
+    opacity: 0.85;
 }
 .type-tutorial {
     color: var(--sl-color-green-high);
