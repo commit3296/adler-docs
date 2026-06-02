@@ -187,36 +187,56 @@ code:not(pre code) {
 /* ─── tables: the compare table on the landing carries credibility,
  * so make sure it renders with the SPA's hairline aesthetic ───
  *
- * Wide tables (the compare table is 6 cols, site-registry tables are
- * 3–4 cols with long cell text) need to *scroll horizontally* on
- * narrow viewports rather than overflow the content area or get
- * clipped. `display: block` lets us put `overflow-x: auto` on the
- * <table> itself without wrapping it in a div via a remark plugin.
+ * Wide-viewport default: real `display: table; width: 100%` so the
+ * browser's table-layout algorithm distributes columns to fill the
+ * content area — the last column reaches the right edge instead of
+ * leaving dead space. `table-layout: auto` lets columns size to
+ * their content; the natural `<table>` formatting context handles
+ * column alignment between thead and tbody.
  *
- * Trade-off: cells lose their `<table>` natural-fit sizing and only
- * grow as wide as their content; on wide viewports the table no
- * longer stretches to fill the column. `min-width: 100%` keeps it
- * full-width when the content fits.
+ * Narrow-viewport fallback (≤ 60rem): switch to `display: block;
+ * overflow-x: auto; width: max-content; min-width: 100%` so the
+ * table scrolls horizontally instead of overflowing the content
+ * column. The trade-off (cells stop filling the table width on
+ * narrow viewports) is acceptable when the alternative is a clipped
+ * table off the right edge of the page.
+ *
+ * `border-collapse: separate; border-spacing: 0` plus `overflow:
+ * hidden` (on wide viewport) is what lets `border-radius: 2px`
+ * actually round the table's outer corners. `collapse` makes
+ * border-radius a no-op on tables in every browser.
  *
  * Earlier iterations layered four background gradients on `<table>`
- * (two 40px-wide bg "covers" + two 14px-wide red "scroll cues") to
- * fake an iOS-style fade at the scroll edges. The covers bled onto
- * the first / last column even when the table wasn't scrollable —
- * the first column appeared to have no left padding, the last got
- * visually clipped on the right. Dropped entirely: the styled
- * horizontal scrollbar plus explicit cell padding give clear
- * affordance without overlaying content.
+ * to fake iOS-style scroll-edge fades. The covers were always
+ * visible (no actual "is scrollable" condition), so they obscured
+ * the first column and clipped the last. Dropped entirely — the
+ * styled horizontal scrollbar at narrow widths is sufficient
+ * affordance.
  */
 .sl-markdown-content table {
-    display: block;
-    width: max-content;
-    min-width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
+    display: table;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
     border: 1px solid var(--sl-color-hairline-shade);
     border-radius: 2px;
-    /* iOS momentum scrolling on the table itself when it overflows. */
-    -webkit-overflow-scrolling: touch;
+    /* `hidden` here clips the cell corners under the table's
+     * border-radius. Switched to `auto` (with horizontal scroll) in
+     * the narrow-viewport media query below.
+     */
+    overflow: hidden;
+}
+@media (max-width: 60rem) {
+    .sl-markdown-content table {
+        display: block;
+        width: max-content;
+        min-width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        /* iOS momentum scrolling. */
+        -webkit-overflow-scrolling: touch;
+    }
 }
 /* Style the horizontal scrollbar so it doesn't look like a default
  * browser scrollbar pasted onto our dark theme. */
