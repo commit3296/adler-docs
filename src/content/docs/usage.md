@@ -109,8 +109,10 @@ adler --doctor                              # check every site
 adler --doctor --only github,gitlab         # subset
 adler --doctor --fix --only patreon         # propose a corrected signature
 adler --doctor --suggest-known-present      # find candidate users for stale entries
+adler --doctor --suggest-extract            # derive extract blocks from OpenGraph; since v0.14
 adler --doctor --fix --apply --sites overrides.json --yes  # patch signals in place; since v0.12
 adler --doctor --suggest-known-present --apply --sites overrides.json --yes  # patch known_present in place; since v0.14
+adler --doctor --suggest-extract --apply --sites overrides.json --yes  # patch extract blocks in place; since v0.14
 adler --doctor --suggest-protection         # cross-scan telemetry; since v0.13
 ```
 
@@ -120,7 +122,7 @@ nightly GitHub Action runs the doctor across the whole registry and flags
 structural rot.
 
 `--apply` <span class="since-chip">since v0.12</span> closes the
-doctor → suggestion → patch loop in two flavours:
+doctor → suggestion → patch loop in three flavours:
 
 - **With `--fix`** — walks the JSON via `--sites`, replaces the
   matching entry's `signals` array with the diffed suggestion, and
@@ -131,15 +133,24 @@ doctor → suggestion → patch loop in two flavours:
   (probes a small pool of well-known usernames) and writes the
   discovered value into the entry's `known_present` field. Same
   atomic-rename pattern.
+- **With `--suggest-extract`** <span class="since-chip">since v0.14</span> —
+  walks every *healthy* site that doesn't yet declare any `extract`
+  rules, fetches the `known_present` profile page, and mines
+  `OpenGraph` (`og:title` / `og:description` / `og:image`) and
+  Twitter Card meta tags to derive a candidate `extract` block. The
+  derived rules read each tag's `content` attribute, so they survive
+  unrelated CSS churn as long as the meta block itself stays put.
+  Sites with an existing `extract` array are skipped so hand-authored
+  selectors aren't clobbered.
 
-Either flavour prints a per-site `- old + new` diff and prompts once
+Every flavour prints a per-site `- old + new` diff and prompts once
 for confirmation; `--yes` skips the prompt for CI batch repair.
 Sites with no suggestion are skipped, names absent from the JSON file
 are reported and skipped (never erased), and `--apply` requires
 `--sites <writable>` because the embedded registry isn't patchable in
-place. A bare `--apply --sites …` without either `--fix` or
-`--suggest-known-present` errors out — `--apply` is the verb, the
-other flag is the noun.
+place. A bare `--apply --sites …` without any of `--fix`,
+`--suggest-known-present`, or `--suggest-extract` errors out —
+`--apply` is the verb, the other flag is the noun.
 
 `--suggest-protection` <span class="since-chip">since v0.13</span>
 reads the persisted scan history (default
