@@ -174,6 +174,26 @@ Escalation only triggers on reasons a browser plausibly resolves —
 `username_not_allowed`, deadline / scheduler / captcha) are kept as-is so
 escalation doesn't waste budget on hopeless cases.
 
+### Suggest pre-tagging from telemetry <span class="since-chip">since v0.13</span>
+
+When a site escalates on most scans, the operator pays a failing HTTP
+probe every time. `--doctor --suggest-protection` closes that loop:
+it reads the persisted scan history
+(`$XDG_CACHE_HOME/adler/scans/*.json` by default, override with
+`--scans-dir`), groups outcomes by site, and flags any site whose
+escalation evidence crosses a threshold (default 60% over ≥3 scans).
+Each finding is a paste-ready candidate for adding `protection:
+cloudflare` to `sites.json` so future scans pick the browser
+transport up front.
+
+```bash
+adler --doctor --suggest-protection                       # default scans dir
+adler --doctor --suggest-protection --scans-dir /custom   # override
+```
+
+Pure suggestion path — never auto-modifies. Output is a table plus a
+`PROTECTION additions:` block ready to drop into the registry.
+
 ## Egress pool (geo routing)
 
 Some sites only answer from a particular country, or block datacenter IP
@@ -217,6 +237,29 @@ IPs); `--proxy-pool` routes the raw-HTTP path.
 When `adler --web` is running, the SPA can [restrict a single scan to a
 subset of the pool by name](/web-ui/#per-scan-egress-subset) <span class="since-chip">since v0.11</span>,
 without re-launching the server.
+
+### Soft routing from `region:*` tags <span class="since-chip">since v0.12</span>
+
+A site's `region:XX` tag (e.g. `region:ru`, `region:pl`) is now treated
+as a *soft* preference for an egress in that country, not a hard
+requirement. At registry-load time Adler fills the site's
+`access.prefer_geo` with the parsed country codes — but only when the
+site doesn't already declare an explicit hard `access.geo` (explicit
+policy always wins).
+
+The router then:
+
+- **Pool has a matching egress** → route through it (better recall on
+  region-locked CDNs).
+- **Pool has no match** → fall back to the default egress and probe
+  normally; the site is *expected* to be reachable from anywhere, the
+  preference was a recall optimisation.
+
+So region-tagged sites still work without any `--proxy-pool` set;
+they just get a recall lift when one is. The hard `access.geo`
+behaviour stays unchanged — no match still yields
+`Uncertain(GeoUnavailable)`. 685 sites in the embedded registry opt
+into this automatically.
 
 ## Sessions (reach login-walled sites) <span class="since-chip">since v0.10</span>
 

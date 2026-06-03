@@ -109,12 +109,36 @@ adler --doctor                              # check every site
 adler --doctor --only github,gitlab         # subset
 adler --doctor --fix --only patreon         # propose a corrected signature
 adler --doctor --suggest-known-present      # find candidate users for stale entries
+adler --doctor --fix --apply --sites overrides.json --yes  # patch in place since v0.12
+adler --doctor --suggest-protection         # cross-scan telemetry; since v0.13
 ```
 
 `--doctor --fix` diffs the present/absent responses and prints a paste-
 ready signal you can drop into the registry (or a local override). A
 nightly GitHub Action runs the doctor across the whole registry and flags
 structural rot.
+
+`--apply` <span class="since-chip">since v0.12</span> closes the
+doctor → fix → patch loop. Instead of copy-pasting each suggested
+signature into `sites.json`, the doctor walks the JSON file you pass
+via `--sites`, replaces the matching entry's `signals` array, and
+writes back through a sibling `*.tmp` so a crash mid-write leaves the
+original intact. The flow prints a per-site signal diff (`- old +
+new`) and prompts once for confirmation; `--yes` skips the prompt
+for CI batch repair. Sites with no suggestion are skipped, names
+absent from the JSON file are reported and skipped (never erased),
+and `--apply` requires `--sites <writable>` because the embedded
+registry isn't patchable in place.
+
+`--suggest-protection` <span class="since-chip">since v0.13</span>
+reads the persisted scan history (default
+`$XDG_CACHE_HOME/adler/scans/`, override with `--scans-dir`) and
+surfaces sites that consistently escalated through the browser
+backend. These are candidates for adding `protection: cloudflare`
+to `sites.json` so future scans skip the failing HTTP probe and pick
+the right transport up front. Pure suggestion path — never auto-
+modifies, same convention as `--suggest-known-present`. Output is a
+paste-ready table plus a `PROTECTION additions:` block.
 
 ## When things go wrong
 

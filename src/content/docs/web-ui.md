@@ -25,6 +25,18 @@ Outcomes stream in as they resolve (SSE), grouped by category, with
 per-row evidence (verdict reason, response snippet, URL) and a one-click
 retry.
 
+The hero input has a **single / batch tab pair**: single takes one
+username (the canonical scan); batch
+<span class="since-chip">since v0.13</span> takes a textarea that
+splits on newline or comma, dedupes, trims, and runs each username
+sequentially as its own scan. Parallel batch would multiply per-host
+throttle pressure across the whole registry. A `BatchStrip` above the
+results shows one chip per username with live status (queued →
+running → done(+found) | error); chips become clickable once the
+whole run finishes so navigating mid-run doesn't close the in-flight
+SSE stream and stall the queue. Same effect as `adler --input
+users.txt` on the CLI.
+
 <figure class="screenshot">
   <img src="/screenshots/01-live-scan.webp"
        alt="Live scan view: outcomes streaming in by category"
@@ -67,6 +79,15 @@ atomic writes). Reopen any past scan via `#/scan/<id>` deep-links.
 Pick any two persisted scans and diff them side-by-side (`#/diff/<a>/<b>`);
 shows accounts gained / lost / flipped between the two runs. Esc /
 back-button exits.
+
+The scan header's **Compare with previous** button
+<span class="since-chip">since v0.13</span> opens a picker listing
+every other finished scan of the same username, newest first. The
+first row is labelled *Most recent* and autofocused, so pressing
+Enter keeps the old auto-pick-newest default for the common case;
+clicking any other row diffs against that specific historical scan.
+Each row shows the relative timestamp ("3h ago"), found/total/elapsed
+metadata, and the absolute timestamp on the right.
 
 <figure class="screenshot">
   <img src="/screenshots/04-diff-view.webp"
