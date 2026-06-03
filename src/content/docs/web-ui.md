@@ -101,6 +101,21 @@ metadata, and the absolute timestamp on the right.
 By verdict, category, presence of evidence, hidden NotFound rows. Preferences
 persist to `localStorage`.
 
+### Mid-scan refilter <span class="since-chip">since v0.14</span>
+
+The Advanced filters modal stays editable while a scan is running.
+When the filter you've edited differs from what the scan was launched
+with, an **Apply (re-scan)** button replaces Done. Clicking it cancels
+the in-flight scan server-side and starts a successor driven by the
+new filter — sites both filters share carry over without re-probing,
+so the operator pays only for newly-in-scope sites. Behind the
+scenes: `POST /api/scan/:id/refilter` with the same shape as
+`POST /api/scan` minus `username`, returns the new `scan_id` plus a
+`carried_outcomes` count, the SPA closes the predecessor SSE stream
+and opens one against the successor. Refilter requires a *running*
+scan: finished scans return 400 `scan_finished` — for those, just
+start a fresh scan instead.
+
 ### NSFW gate
 
 Off by default; the toggle is hidden behind a confirmation, matching the
@@ -144,9 +159,36 @@ drive Adler from a different frontend or a script:
 | `GET`  | `/api/scan/:id` | Final aggregate (or 202 in-progress / 404). |
 | `GET`  | `/api/scan/:id/stream` | Server-Sent Events stream of outcomes. |
 | `POST` | `/api/scan/:id/retry` | Re-probe a single site. |
+| `POST` | `/api/scan/:id/refilter` | Cancel running scan, replace with successor under a new filter (since v0.14). |
 
 SSE consumers should subscribe to the `/stream` endpoint and treat each
 event as one outcome.
+
+### Mid-scan refilter — `POST /api/scan/:id/refilter`
+
+Body shape mirrors `POST /api/scan` minus `username` (carried over from
+the existing scan). The server cancels the in-flight scan, computes
+the overlap between old and new site lists, pre-populates the
+successor's outcome buffer with overlapping outcomes, and starts a
+fresh task that only probes the not-yet-done sites. Response:
+
+```json
+{
+  "scan_id": "<new id>",
+  "derived_from": "<old id>",
+  "carried_outcomes": 142,
+  "site_count": 188
+}
+```
+
+Error cases:
+- `404 scan_not_found` — unknown `id`.
+- `400 scan_finished` — predecessor already completed; start a fresh
+  `POST /api/scan` instead of refiltering.
+- `400 empty_site_filter` — new filter resolves to zero sites.
+- `400 unknown_egress` — `egress_names` references a name not in the
+  loaded pool (validated before the cancel, so the predecessor survives
+  a typo).
 
 ### Per-scan egress in `POST /api/scan`
 
