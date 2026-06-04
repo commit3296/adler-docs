@@ -114,12 +114,24 @@ adler --doctor --fix --apply --sites overrides.json --yes  # patch signals in pl
 adler --doctor --suggest-known-present --apply --sites overrides.json --yes  # patch known_present in place; since v0.14
 adler --doctor --suggest-extract --apply --sites overrides.json --yes  # patch extract blocks in place; since v0.14
 adler --doctor --suggest-protection         # cross-scan telemetry; since v0.13
+adler --doctor --format ndjson              # structured output (json|ndjson); since v0.14
 ```
 
 `--doctor --fix` diffs the present/absent responses and prints a paste-
 ready signal you can drop into the registry (or a local override). A
 nightly GitHub Action runs the doctor across the whole registry and flags
 structural rot.
+
+`--format json` / `--format ndjson` <span class="since-chip">since v0.14</span> emits
+structured output instead of the human-readable `[OK]` / `[FAIL]` lines.
+`json` produces a single envelope `{"sites":[…],"summary":{…}}` (pretty-
+printed); `ndjson` streams one record per line plus a final tagged
+`{"type":"summary",…}` line, ideal for piping through `jq` or feeding
+into `scripts/doctor_aggregate.py` (which auto-detects either format).
+Each per-site record is `{"name":<str>,"verdict":"healthy"|"unhealthy",
+"issues":[<str>]}`. The `--format csv` and `--format html` modes from
+the scan path don't fit the doctor's shape and are rejected with an
+actionable error.
 
 `--apply` <span class="since-chip">since v0.12</span> closes the
 doctor → suggestion → patch loop in three flavours:
