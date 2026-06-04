@@ -174,6 +174,66 @@ the right transport up front. Pure suggestion path — never auto-
 modifies, same convention as `--suggest-known-present`. Output is a
 paste-ready table plus a `PROTECTION additions:` block.
 
+## MCP server <span class="since-chip">since v0.15</span>
+
+```bash
+adler --mcp                                       # stdio (Claude Desktop / Cursor / local agents)
+adler --mcp-http 127.0.0.1:8766                   # HTTP+SSE, endpoint http://127.0.0.1:8766/mcp
+```
+
+Adler ships a [Model Context Protocol](https://modelcontextprotocol.io/)
+server (`adler-mcp` crate, default-on) that exposes the OSINT surface
+to AI agents. Same tool / resource / prompt set regardless of
+transport — pick stdio when the agent spawns Adler as a subprocess
+(Claude Desktop, Cursor); pick HTTP+SSE when the agent runs out-of-
+process or on a different host.
+
+**Tools** (callable agent actions):
+
+- `list_sites` — browse the enabled registry; filter by `tag` /
+  `exclude_tag` / `include_nsfw`.
+- `scan_username` — single-username scan; streams per-site progress
+  as MCP `notifications/progress` when the client supplies a
+  `progressToken`.
+- `scan_batch` — sequential multi-username scan; same shared
+  `ScanFilter` shape as `scan_username`.
+- `doctor_check` — health probe one named site; useful for triaging
+  "why didn't this site come back Found?".
+- `get_scan_history` — recent persisted scans from
+  `$XDG_CACHE_HOME/adler/scans/` (where `adler --web` writes).
+
+**Resources** (browsable data):
+
+- `adler://registry/sites` — every enabled site (compact: name, URL
+  template, tags, popularity).
+- `adler://registry/tags` — every tag with its enabled-site count.
+- `adler://registry/disabled` — disabled entries with their
+  `disabled_reason` annotations (audit surface).
+- `adler://scans/recent` — recent persisted scan summaries.
+- `adler://scans/{id}` — full envelope for one scan (template).
+
+**Prompts** (templated OSINT workflows the agent can `prompts/get`):
+
+- `investigate_username(username, regions?, categories?)` — full
+  OSINT walk for one identity.
+- `audit_registry_health(focus?)` — doctor + dedup + disabled audit
+  with a built-in ~5-site doctor budget.
+- `correlate_accounts(usernames)` — scan a list and look for shared
+  profile signal (Strong / Plausible / Weak / Distinct rubric).
+
+**Security defaults.** The HTTP transport binds loopback by default
+and inherits rmcp's `allowed_hosts` filter (`localhost`, `127.0.0.1`,
+`::1`) as a DNS-rebind guard. Binding a non-loopback address exposes
+the API without authentication — only do it on a trusted network.
+Stdio carries no network surface and is the recommended transport
+for desktop integrations.
+
+**Ethical line.** The MCP `instructions` block sent to the agent on
+`initialize` restates the project's bound: authorised security
+testing / OSINT research / defensive work only; no harassment /
+doxxing / unauthorised surveillance. The `investigate_username`
+prompt repeats this in its body for context.
+
 ## When things go wrong
 
 Real shapes for the most common failure modes — copy-and-paste examples
