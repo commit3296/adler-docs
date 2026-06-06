@@ -79,7 +79,7 @@ adler --version
 adler --doctor --only github   # quick check against a known signature
 ```
 
-`adler --version` <span class="since-chip">since v0.13</span> prints
+`adler --version` <span class="since-chip">since v0.11.4</span> prints
 the crate version plus build provenance (short git SHA, target triple,
 opt-in feature flags). Include the multi-line output verbatim in bug
 reports so the maintainer doesn't have to ask which build you have:
@@ -96,7 +96,7 @@ features: <default>
 ## Verifying release archives (Sigstore cosign)
 
 Every platform archive attached to a GitHub Release
-<span class="since-chip">since v0.12</span> ships with a matching
+<span class="since-chip">since v0.11.4</span> ships with a matching
 `.sig` (Sigstore signature) and `.pem` (Fulcio certificate). Signing
 is keyless — no long-lived key in repo secrets — backed by the
 workflow's OIDC token, exchanged for a short-lived certificate bound
@@ -126,7 +126,7 @@ it.
 
 ## For distro packagers
 
-`adler --man-page` <span class="since-chip">since v0.13</span> prints
+`adler --man-page` <span class="since-chip">since v0.11.4</span> prints
 a roff(1) man page generated from the same clap definition that
 drives `--help`, so there's no hand-maintained `.1` file to fall out
 of sync. Pipe it straight into the package's man path:

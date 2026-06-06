@@ -27,7 +27,7 @@ retry.
 
 The hero input has a **single / batch tab pair**: single takes one
 username (the canonical scan); batch
-<span class="since-chip">since v0.13</span> takes a textarea that
+<span class="since-chip">since v0.8.3</span> takes a textarea that
 splits on newline or comma, dedupes, trims, and runs each username
 sequentially as its own scan. Parallel batch would multiply per-host
 throttle pressure across the whole registry. A `BatchStrip` above the
@@ -81,7 +81,7 @@ shows accounts gained / lost / flipped between the two runs. Esc /
 back-button exits.
 
 The scan header's **Compare with previous** button
-<span class="since-chip">since v0.13</span> opens a picker listing
+<span class="since-chip">since v0.11.4</span> opens a picker listing
 every other finished scan of the same username, newest first. The
 first row is labelled *Most recent* and autofocused, so pressing
 Enter keeps the old auto-pick-newest default for the common case;
@@ -101,7 +101,7 @@ metadata, and the absolute timestamp on the right.
 By verdict, category, presence of evidence, hidden NotFound rows. Preferences
 persist to `localStorage`.
 
-### Mid-scan refilter <span class="since-chip">since v0.14</span>
+### Mid-scan refilter <span class="since-chip">since v0.11.5</span>
 
 The Advanced filters modal stays editable while a scan is running.
 When the filter you've edited differs from what the scan was launched
@@ -159,7 +159,7 @@ drive Adler from a different frontend or a script:
 | `GET`  | `/api/scan/:id` | Final aggregate (or 202 in-progress / 404). |
 | `GET`  | `/api/scan/:id/stream` | Server-Sent Events stream of outcomes. |
 | `POST` | `/api/scan/:id/retry` | Re-probe a single site. |
-| `POST` | `/api/scan/:id/refilter` | Cancel running scan, replace with successor under a new filter (since v0.14). |
+| `POST` | `/api/scan/:id/refilter` | Cancel running scan, replace with successor under a new filter (since v0.11.5). |
 
 SSE consumers should subscribe to the `/stream` endpoint and treat each
 event as one outcome.

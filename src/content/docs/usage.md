@@ -109,12 +109,12 @@ adler --doctor                              # check every site
 adler --doctor --only github,gitlab         # subset
 adler --doctor --fix --only patreon         # propose a corrected signature
 adler --doctor --suggest-known-present      # find candidate users for stale entries
-adler --doctor --suggest-extract            # derive extract blocks from OpenGraph; since v0.14
-adler --doctor --fix --apply --sites overrides.json --yes  # patch signals in place; since v0.12
-adler --doctor --suggest-known-present --apply --sites overrides.json --yes  # patch known_present in place; since v0.14
-adler --doctor --suggest-extract --apply --sites overrides.json --yes  # patch extract blocks in place; since v0.14
-adler --doctor --suggest-protection         # cross-scan telemetry; since v0.13
-adler --doctor --format ndjson              # structured output (json|ndjson); since v0.14
+adler --doctor --suggest-extract            # derive extract blocks from OpenGraph; since v0.11.6
+adler --doctor --fix --apply --sites overrides.json --yes  # patch signals in place; since v0.11.2
+adler --doctor --suggest-known-present --apply --sites overrides.json --yes  # patch known_present in place; since v0.11.6
+adler --doctor --suggest-extract --apply --sites overrides.json --yes  # patch extract blocks in place; since v0.11.6
+adler --doctor --suggest-protection         # cross-scan telemetry; since v0.11.2
+adler --doctor --format ndjson              # structured output (json|ndjson); since v0.12.0
 ```
 
 `--doctor --fix` diffs the present/absent responses and prints a paste-
@@ -122,7 +122,7 @@ ready signal you can drop into the registry (or a local override). A
 nightly GitHub Action runs the doctor across the whole registry and flags
 structural rot.
 
-`--format json` / `--format ndjson` <span class="since-chip">since v0.14</span> emits
+`--format json` / `--format ndjson` <span class="since-chip">since v0.12.0</span> emits
 structured output instead of the human-readable `[OK]` / `[FAIL]` lines.
 `json` produces a single envelope `{"sites":[…],"summary":{…}}` (pretty-
 printed); `ndjson` streams one record per line plus a final tagged
@@ -133,19 +133,19 @@ Each per-site record is `{"name":<str>,"verdict":"healthy"|"unhealthy",
 the scan path don't fit the doctor's shape and are rejected with an
 actionable error.
 
-`--apply` <span class="since-chip">since v0.12</span> closes the
+`--apply` <span class="since-chip">since v0.11.2</span> closes the
 doctor → suggestion → patch loop in three flavours:
 
 - **With `--fix`** — walks the JSON via `--sites`, replaces the
   matching entry's `signals` array with the diffed suggestion, and
   writes back through a sibling `*.tmp` so a crash mid-write leaves
   the original intact.
-- **With `--suggest-known-present`** <span class="since-chip">since v0.14</span> —
+- **With `--suggest-known-present`** <span class="since-chip">since v0.11.6</span> —
   discovers a fresh `known_present` candidate for each failing site
   (probes a small pool of well-known usernames) and writes the
   discovered value into the entry's `known_present` field. Same
   atomic-rename pattern.
-- **With `--suggest-extract`** <span class="since-chip">since v0.14</span> —
+- **With `--suggest-extract`** <span class="since-chip">since v0.11.6</span> —
   walks every *healthy* site that doesn't yet declare any `extract`
   rules, fetches the `known_present` profile page, and mines
   `OpenGraph` (`og:title` / `og:description` / `og:image`) and
@@ -164,7 +164,7 @@ place. A bare `--apply --sites …` without any of `--fix`,
 `--suggest-known-present`, or `--suggest-extract` errors out —
 `--apply` is the verb, the other flag is the noun.
 
-`--suggest-protection` <span class="since-chip">since v0.13</span>
+`--suggest-protection` <span class="since-chip">since v0.11.2</span>
 reads the persisted scan history (default
 `$XDG_CACHE_HOME/adler/scans/`, override with `--scans-dir`) and
 surfaces sites that consistently escalated through the browser
@@ -174,7 +174,7 @@ the right transport up front. Pure suggestion path — never auto-
 modifies, same convention as `--suggest-known-present`. Output is a
 paste-ready table plus a `PROTECTION additions:` block.
 
-## MCP server <span class="since-chip">since v0.15</span>
+## MCP server <span class="since-chip">since v0.12.0</span>
 
 ```bash
 adler --mcp                                       # stdio (Claude Desktop / Cursor / local agents)

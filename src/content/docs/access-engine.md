@@ -139,7 +139,7 @@ on the bot-protected subset, but on the rest of the registry they'd add
 latency for no recall gain — which is why routing is opt-in and
 tag-driven, not blanket.
 
-## Automatic escalation <span class="since-chip">since v0.10</span>
+## Automatic escalation <span class="since-chip">since v0.11.0</span>
 
 The pre-tag routing above handles sites the registry has *already* marked
 as `bot-protected`. It can't help with the long tail — sites that look
@@ -174,7 +174,7 @@ Escalation only triggers on reasons a browser plausibly resolves —
 `username_not_allowed`, deadline / scheduler / captcha) are kept as-is so
 escalation doesn't waste budget on hopeless cases.
 
-### Suggest pre-tagging from telemetry <span class="since-chip">since v0.13</span>
+### Suggest pre-tagging from telemetry <span class="since-chip">since v0.11.2</span>
 
 When a site escalates on most scans, the operator pays a failing HTTP
 probe every time. `--doctor --suggest-protection` closes that loop:
@@ -238,7 +238,7 @@ When `adler --web` is running, the SPA can [restrict a single scan to a
 subset of the pool by name](/web-ui/#per-scan-egress-subset) <span class="since-chip">since v0.11</span>,
 without re-launching the server.
 
-### Soft routing from `region:*` tags <span class="since-chip">since v0.12</span>
+### Soft routing from `region:*` tags <span class="since-chip">since v0.11.1</span>
 
 A site's `region:XX` tag (e.g. `region:ru`, `region:pl`) is now treated
 as a *soft* preference for an egress in that country, not a hard
