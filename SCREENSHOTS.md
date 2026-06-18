@@ -1,23 +1,34 @@
-# Screenshots brief
+# Screenshots maintenance
 
-The Web UI page renders pretty short without visual proof of the SPA.
-The five screenshots below are what's needed to make the page actually
-explain itself in 2 seconds instead of 200 words.
+The Web UI docs page uses five WebP screenshots from
+`public/screenshots/`. Keep the filenames stable so links in
+`src/content/docs/web-ui.md` keep resolving:
 
-Do not add `<img src="/screenshots/...">` references before the files
+- `01-live-scan.webp` — running scan view.
+- `02-result-row-detail.webp` — expanded result row with confidence,
+  transport, evidence, identity clusters, and report export controls.
+- `03-history-modal.webp` — persisted scan history modal.
+- `04-diff-view.webp` — scan diff view.
+- `05-access-modal.webp` — access engine modal with non-secret metadata.
+
+The current images were captured from the local Adler Web UI with
+deterministic mocked API data. That is intentional: docs screenshots
+should not depend on live sites, operator sessions, proxy pools, or
+external network timing.
+
+Do not add new `<img src="/screenshots/...">` references before the files
 exist in `public/screenshots/` — that creates broken production images
-and fails lychee. Take the screenshots with the framing below, drop the
-WebP files into `public/screenshots/`, then add the corresponding
-figures to `src/content/docs/web-ui.md` in the same PR.
+and fails lychee.
 
 ## Setup
 
-1. Build a fresh `adler` with the feature flags you want pictured:
+1. Build a fresh Web UI:
    ```bash
-   cargo install --path adler-cli --features impersonate
+   npm --prefix ../repo/adler-server/web run build
    ```
-2. Launch the server with a non-trivial config so the Access modal has
-   something to show:
+2. Run either the real server or a local preview with deterministic API
+   mocks. Real-server captures need a non-trivial config so the Access
+   modal has something to show:
    ```bash
    adler --web \
        --proxy-pool ~/.config/adler/pool.toml \
@@ -27,7 +38,8 @@ figures to `src/content/docs/web-ui.md` in the same PR.
    If you don't have a pool / sessions file handy, copy the examples
    from `/access-engine/#egress-pool-geo-routing` and
    `/access-engine/#sessions-reach-login-walled-sites`.
-3. Open `http://127.0.0.1:8080/` in your browser.
+3. Open `http://127.0.0.1:8080/` in your browser, or use Playwright
+   against `vite preview` when refreshing mocked screenshots.
 
 ## Capture settings
 
@@ -46,7 +58,7 @@ figures to `src/content/docs/web-ui.md` in the same PR.
 
 ## Frames
 
-### 1. `01-live-scan.webp` — Live scan view
+### 1. `01-live-scan.webp` — running scan view
 
 > A scan in progress, mid-stream, with the live SSE outcomes painting
 > the categorised result list. This is the canonical "Adler in action"
@@ -59,7 +71,7 @@ figures to `src/content/docs/web-ui.md` in the same PR.
   of rows have arrived. Visible Found / Uncertain rows in a couple of
   category groups (dev, social, …) is the look.
 
-### 2. `02-result-row-detail.webp` — Result row with transport chip
+### 2. `02-result-row-detail.webp` — result row with evidence
 
 > A close-up of one or two `ResultRow`s with the `transport` chip
 > visible — proves the v0.10 telemetry exists and shows what `browser*`
@@ -70,7 +82,8 @@ figures to `src/content/docs/web-ui.md` in the same PR.
 - Wait for the scan to finish so escalations have settled.
 - Scroll to a row where the `transport` chip reads `browser*` (small
   red-orange chip in the meta column).
-- Capture the row plus the one above and below for context.
+- Capture the row plus nearby context. Prefer a frame that also shows
+  report export controls and identity clusters when possible.
 
 ### 3. `03-history-modal.webp` — History drawer
 
@@ -108,12 +121,12 @@ figures to `src/content/docs/web-ui.md` in the same PR.
 - Click the **shield** icon in the top bar.
 - Capture the modal open.
 
-## After upload
+## After refresh
 
-Once the files land in `public/screenshots/`:
+Once the files are updated in `public/screenshots/`:
 
-1. Add the matching `<figure>` blocks back to
-   `src/content/docs/web-ui.md`.
+1. Confirm `src/content/docs/web-ui.md` still references the intended
+   files.
 2. Run `npm run build`.
 3. Commit + push.
 4. CF Pages rebuilds; `adler-docs.pages.dev/web-ui/` renders the
