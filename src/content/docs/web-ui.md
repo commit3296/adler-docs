@@ -37,13 +37,6 @@ whole run finishes so navigating mid-run doesn't close the in-flight
 SSE stream and stall the queue. Same effect as `adler --input
 users.txt` on the CLI.
 
-<figure class="screenshot">
-  <img src="/screenshots/01-live-scan.webp"
-       alt="Live scan view: outcomes streaming in by category"
-       loading="lazy" />
-  <figcaption>Live scan view, mid-stream. Categories on the left, outcomes painting as SSE events arrive.</figcaption>
-</figure>
-
 ### Result rows
 
 Each row shows the verdict (Found / NotFound / Uncertain), the elapsed
@@ -61,24 +54,10 @@ drawer: signal evidence, confidence reasons, structured
 `profile_evidence`, transport, escalation count, and non-secret evidence
 source metadata when present.
 
-<figure class="screenshot">
-  <img src="/screenshots/02-result-row-detail.webp"
-       alt="ResultRow close-up with transport chip and escalation marker"
-       loading="lazy" />
-  <figcaption>The <code>browser*</code> chip on the meta column marks an outcome where the cheap HTTP path returned <code>Uncertain(cloudflare_challenge)</code> and the router automatically escalated.</figcaption>
-</figure>
-
 ### History
 
 Every finished scan is persisted to `~/.cache/adler/scans/` (oldest 200,
 atomic writes). Reopen any past scan via `#/scan/<id>` deep-links.
-
-<figure class="screenshot">
-  <img src="/screenshots/03-history-modal.webp"
-       alt="History drawer with the last few scans"
-       loading="lazy" />
-  <figcaption>The History drawer (clock icon) lists every finished scan. Click any row to reopen, or arm a scan as the "compare with" source for a diff.</figcaption>
-</figure>
 
 ### Compare with previous
 
@@ -94,13 +73,6 @@ Enter keeps the old auto-pick-newest default for the common case;
 clicking any other row diffs against that specific historical scan.
 Each row shows the relative timestamp ("3h ago"), found/total/elapsed
 metadata, and the absolute timestamp on the right.
-
-<figure class="screenshot">
-  <img src="/screenshots/04-diff-view.webp"
-       alt="Side-by-side diff of two scans of the same username"
-       loading="lazy" />
-  <figcaption>Diff view at <code>#/diff/&lt;a&gt;/&lt;b&gt;</code>. Accounts gained, lost, and flipped between the two runs surface in three columns.</figcaption>
-</figure>
 
 ### Filters & sort
 
@@ -151,13 +123,6 @@ loaded from `--proxy-pool` (name, country, kind per egress — *never*
 proxy URLs) and `--sessions` (names only, never header values).
 Sensitive material is kept off the HTTP API by design; editing happens
 by updating the TOML files and restarting the server.
-
-<figure class="screenshot">
-  <img src="/screenshots/05-access-modal.webp"
-       alt="Access engine modal: egress pool and session names, no secrets"
-       loading="lazy" />
-  <figcaption>The shield icon's modal: configured egresses (name, country, kind) and session names. Proxy URLs and session header values never appear in any HTTP API response.</figcaption>
-</figure>
 
 ### Per-scan egress subset <span class="since-chip">since v0.11</span>
 
