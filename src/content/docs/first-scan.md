@@ -60,7 +60,7 @@ Confirm:
 
 ```bash
 adler --version
-# adler 0.11.0
+# adler 0.15.0
 ```
 
 The [Install](/install/) page covers every flavour in more depth if

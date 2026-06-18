@@ -1,6 +1,6 @@
 ---
 title: Web UI
-description: The SolidJS SPA bundled with adler — live SSE streaming, history, side-by-side diff, access engine view, per-scan egress subset.
+description: The SolidJS SPA bundled with adler — live SSE streaming, evidence/confidence views, identity clusters, report exports, history, diff, and access engine controls.
 ---
 
 <p class="audience-badge audience-operator">For operators · running scans</p>
@@ -22,8 +22,8 @@ adler --web --web-bind 0.0.0.0:9000  # listen on all interfaces, custom port
 ### Live scan view
 
 Outcomes stream in as they resolve (SSE), grouped by category, with
-per-row evidence (verdict reason, response snippet, URL) and a one-click
-retry.
+per-row evidence (verdict reason, response snippet, URL), confidence
+chips, and a one-click retry.
 
 The hero input has a **single / batch tab pair**: single takes one
 username (the canonical scan); batch
@@ -54,6 +54,12 @@ outcome where the cheap path returned an
 `Uncertain(cloudflare_challenge | rate_limited)` and the router
 automatically escalated through the browser. The common Http+0 case
 stays uncluttered.
+
+Confidence chips show the explainable score label (`high`, `medium`,
+`low`) computed by the core rule set. Expanding a row opens the evidence
+drawer: signal evidence, confidence reasons, structured
+`profile_evidence`, transport, escalation count, and non-secret evidence
+source metadata when present.
 
 <figure class="screenshot">
   <img src="/screenshots/02-result-row-detail.webp"
@@ -100,6 +106,23 @@ metadata, and the absolute timestamp on the right.
 
 By verdict, category, presence of evidence, hidden NotFound rows. Preferences
 persist to `localStorage`.
+
+### Identity clusters and report export
+
+Finished scans can include compact identity-cluster cards above the
+result list. A cluster groups Found profiles only when deterministic
+structured evidence overlaps — shared external links, display names,
+bio phrases, locations, avatar URLs, avatar hashes, or historical
+co-occurrence. Username-only matches do not create clusters. Cards show
+the cluster id, confidence, `uncertain` badge when the link is tentative,
+reasons, and member profile URLs.
+
+The finished scan view also exposes report downloads:
+
+- JSON — direct `InvestigationReport` model for downstream tools.
+- Markdown — text report for notes / tickets.
+- HTML — self-contained local case file, no JavaScript and no external
+  avatar/image loads.
 
 ### Mid-scan refilter <span class="since-chip">since v0.11.5</span>
 
@@ -158,11 +181,33 @@ drive Adler from a different frontend or a script:
 | `POST` | `/api/scan` | Start a scan; returns a `scan_id`. |
 | `GET`  | `/api/scan/:id` | Final aggregate (or 202 in-progress / 404). |
 | `GET`  | `/api/scan/:id/stream` | Server-Sent Events stream of outcomes. |
+| `GET`  | `/api/scan/:id/report?format=json\|markdown\|html` | Case-level investigation report for a finished scan. |
 | `POST` | `/api/scan/:id/retry` | Re-probe a single site. |
 | `POST` | `/api/scan/:id/refilter` | Cancel running scan, replace with successor under a new filter (since v0.11.5). |
 
 SSE consumers should subscribe to the `/stream` endpoint and treat each
 event as one outcome.
+
+Finished `GET /api/scan/:id` responses include `identity_clusters` when
+structured profile evidence supports a deterministic cluster. Running
+snapshots and per-outcome SSE events stay outcome-shaped; clusters are
+finished-scan data.
+
+### Report endpoint — `GET /api/scan/:id/report`
+
+`format=json` (default) returns the direct `InvestigationReport` JSON
+model. `format=markdown` returns `text/markdown; charset=utf-8`.
+`format=html` returns `text/html; charset=utf-8`.
+
+Error cases:
+- `404 scan_not_found` — unknown `id`.
+- `400 scan_not_finished` — report generation is finished-scan only.
+- `400 invalid_report_format` — format is not `json`, `markdown`, or
+  `html`.
+
+Reports are derived at read time. Persisted scans can receive historical
+confidence overlays and rebuilt clusters in the response, but the stored
+JSON artifact is not rewritten.
 
 ### Mid-scan refilter — `POST /api/scan/:id/refilter`
 

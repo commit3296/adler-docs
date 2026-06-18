@@ -8,10 +8,10 @@ description: Drive adler-core from your own Rust code — minimal worked example
 
 <aside class="tldr">
 
-- **Rust:** add `adler-core = "0.10"`, build a `Client`, call `executor::run` — minimal example below.
+- **Rust:** add `adler-core = "0.15"`, build a `Client`, call `executor::run` — minimal example below.
 - **Other languages:** shell out to `adler --format ndjson <username>` and parse one outcome per line. Python / Go / Node examples in [Driving Adler from other languages](#driving-adler-from-other-languages).
 - **Knobs you'll actually touch:** `Client::builder()` (timeout, retries, browser, escalation), `Registry::filter` (tags / regex), `Site::access` (egress / session policy).
-- **Telemetry:** every `CheckOutcome` carries `transport` + `escalations` — preserve them through your pipeline so consumers can distinguish `Found via browser` from `Found via raw HTTP`.
+- **Telemetry:** every `CheckOutcome` carries `transport`, `escalations`, `evidence`, `profile_evidence`, and `confidence` — preserve them through your pipeline so consumers can explain why a result was trusted.
 
 </aside>
 
@@ -29,7 +29,7 @@ this page covers the worked example and the notable knobs.
 
 ```toml
 [dependencies]
-adler-core = "0.10"
+adler-core = "0.15"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
@@ -39,7 +39,7 @@ To opt into the TLS-fingerprint impersonation transport, enable the
 
 ```toml
 [dependencies]
-adler-core = { version = "0.10", features = ["impersonate"] }
+adler-core = { version = "0.15", features = ["impersonate"] }
 ```
 
 ## Minimal worked example
@@ -78,7 +78,7 @@ a subprocess API can stream that, which is the recommended bridge for
 Python / Go / Node embedders. Shape per line:
 
 ```json
-{"site":"GitHub","kind":"found","transport":"http","escalations":0,"url":"https://github.com/torvalds","elapsed_ms":124}
+{"site":"GitHub","kind":"found","transport":"http","escalations":0,"url":"https://github.com/torvalds","elapsed_ms":124,"confidence":{"score":85,"label":"high","reasons":[{"kind":"found_by_signal"}]}}
 {"site":"Reddit","kind":"uncertain","reason":"cloudflare_challenge","transport":"http","escalations":0,"elapsed_ms":410}
 ```
 
@@ -205,13 +205,32 @@ subprocess (see [Web UI → JSON API](/web-ui/#json-api)).
 | `Site::known_present` | `KnownPresent::Single(String)` or `KnownPresent::Multiple(Vec<String>)`; `--doctor` passes if **any** declared username resolves to `Found`. |
 | `BrowserBackend` trait | route bot-protected sites through real Chrome. Built-in: `LocalBackend` (chromiumoxide) and `BrowserbaseBackend` (cloud CDP). |
 | `CheckOutcome.transport` / `escalations` | telemetry — which transport produced the verdict, how many escalations happened. |
+| `CheckOutcome.evidence` / `profile_evidence` / `confidence` | explainability payload: signal evidence, normalized profile facts, and machine-readable confidence reasons. |
+| `build_identity_clusters(username, outcomes)` | deterministic account grouping from structured profile evidence; never merges on username alone. |
+| `InvestigationReportBuilder` | case-level report model that combines summary, found accounts, high-confidence accounts, evidence table, identity clusters, timeline, and limitations. |
+| `avatar_hash_from_bytes` / `fetch_avatar_hash` | opt-in avatar perceptual hash helpers; callers must decide when external avatar fetching is appropriate. |
 
 ## Outcome telemetry
 
 Every `CheckOutcome` carries `transport` (`http` / `impersonate` /
 `browser`) and `escalations` (usually `0`, `1` when the cheap path was
-retried through the browser). Persisted scans saved before these fields
-existed still deserialise — both are `Option`/`u8` with serde defaults.
+retried through the browser), plus signal `evidence`, normalized
+`profile_evidence`, and a `confidence` score with machine-readable
+reasons. Persisted scans saved before these fields existed still
+deserialise because newly added fields use serde-compatible defaults.
+
+`profile_evidence` is deliberately narrower than arbitrary page
+content: display names, bios, avatar URLs / avatar hashes, external
+links, locations, joined dates, titles, descriptions, and strict
+username-confirmation facts. Evidence source metadata records
+non-secret provenance such as transport and whether authenticated access
+was used; it does not store session names, cookie/header values, proxy
+URLs, or egress names.
+
+Identity clustering is a separate deterministic layer. Build clusters
+from `Found` outcomes with structured profile evidence, treat
+`uncertain: true` clusters as weak/supporting leads, and do not merge
+accounts on username alone.
 
 ## Breaking changes by version
 
@@ -234,6 +253,12 @@ Pre-1.0 SemVer.
   `escalations` fields (serde-default — old scans deserialise unchanged);
   `EscalationBudget` + `ClientBuilder::escalation_budget` /
   `disable_escalation`.
+- **0.12.0–0.15.0** — explainability and case-file models landed:
+  `ProfileEvidence`, `EvidenceSource` access metadata, `ConfidenceScore`,
+  `IdentityCluster`, `InvestigationReport`, strict username evidence from
+  `body_username` signals, historical-confidence overlays, and opt-in
+  avatar-hash evidence. These are additive serde shapes; older persisted
+  scans still load and derive missing confidence / clusters at read time.
 
 Each change has a migration block in
 [the CHANGELOG](https://github.com/commit3296/adler/blob/main/CHANGELOG.md).
