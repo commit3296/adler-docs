@@ -29,6 +29,7 @@ troubleshooting).
 │   │   ├── usage.md
 │   │   ├── access-engine.md
 │   │   ├── web-ui.md
+│   │   ├── investigation-reports.md
 │   │   ├── embedding.md
 │   │   ├── site-registry.md
 │   │   └── faq.md

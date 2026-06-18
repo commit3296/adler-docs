@@ -96,6 +96,9 @@ The finished scan view also exposes report downloads:
 - HTML — self-contained local case file, no JavaScript and no external
   avatar/image loads.
 
+See [Investigation reports](/investigation-reports/) for the shared
+CLI/Web/MCP report model and privacy notes.
+
 ### Mid-scan refilter <span class="since-chip">since v0.11.5</span>
 
 The Advanced filters modal stays editable while a scan is running.
@@ -172,7 +175,8 @@ Error cases:
 
 Reports are derived at read time. Persisted scans can receive historical
 confidence overlays and rebuilt clusters in the response, but the stored
-JSON artifact is not rewritten.
+JSON artifact is not rewritten. For examples across CLI, Web API, and
+MCP, see [Investigation reports](/investigation-reports/).
 
 ### Mid-scan refilter — `POST /api/scan/:id/refilter`
 

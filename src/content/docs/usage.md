@@ -48,7 +48,9 @@ adler --color never alice                # disable colors (also honors NO_COLOR)
 `--format json` for a live scan intentionally remains a top-level array
 of `CheckOutcome` objects. Case-file output uses `--report-scan` so
 downstream tools can opt into the richer `InvestigationReport` model
-without breaking scan JSON consumers.
+without breaking scan JSON consumers. See
+[Investigation reports](/investigation-reports/) for the full case-file
+workflow.
 
 ## Network & sessions
 
@@ -129,7 +131,9 @@ reasons, identity clusters, timeline events, and limitations. JSON is
 the direct `InvestigationReport` shape; Markdown and HTML are renderers
 over the same model. Report generation applies the same read-time
 historical confidence overlay as persisted Web/MCP views and does not
-rewrite the stored scan artifact.
+rewrite the stored scan artifact. The dedicated
+[Investigation reports](/investigation-reports/) guide covers CLI,
+Web API, MCP, privacy, and troubleshooting details.
 
 ## Doctor
 
