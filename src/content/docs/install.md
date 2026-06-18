@@ -68,9 +68,9 @@ separately for embedding the engine in your own tools — see
 
 | Crate         | Kind | Purpose                                                  |
 | ------------- | ---- | -------------------------------------------------------- |
-| `adler-core`  | lib  | Detection engine, site registry, executor.               |
-| `adler-server`| lib  | HTTP API + SSE streaming + scan persistence; embeds the SolidJS web UI via `rust-embed`. |
-| `adler-cli`   | bin  | `adler` command-line interface; `--web` launches the embedded server + UI in-process. |
+| `adler-core`  | lib  | Detection engine, site registry, evidence/confidence models, identity clusters, investigation report model. |
+| `adler-server`| lib  | HTTP API + SSE streaming + scan persistence; exposes persisted scans, reports, timelines, and the embedded SolidJS web UI. |
+| `adler-cli`   | bin  | `adler` command-line interface; scans, explains evidence, renders report exports, and launches the embedded server + UI with `--web`. |
 
 ## Verifying the install
 
@@ -92,6 +92,29 @@ features: <default>
 ```
 
 `-V` keeps the one-line form for scripts.
+
+## First useful run
+
+After the binary is verified, run a small explained scan before scaling
+to the full registry:
+
+```bash
+adler --explain --only github,gitlab torvalds
+```
+
+That path confirms the registry, network, text renderer, confidence
+rules, and signal evidence are all working. For the full onboarding
+flow — scan, evidence, confidence, identity clusters, and report export
+— continue to [Quickstart](/quickstart/) or the guided
+[First scan walkthrough](/first-scan/).
+
+For a browser workflow with persisted scan ids and one-click case-file
+exports:
+
+```bash
+adler --web
+# http://127.0.0.1:8080
+```
 
 ## Verifying release archives (Sigstore cosign)
 
