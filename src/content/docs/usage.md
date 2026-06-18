@@ -1,6 +1,6 @@
 ---
 title: Usage
-description: Common CLI flags grouped by intent — filtering, output, network, browser, cache, batch, and enrichment.
+description: Common CLI flags grouped by intent — filtering, output, reports, network, browser, cache, batch, enrichment, and MCP.
 ---
 
 <p class="audience-badge audience-operator">For operators · running scans</p>
@@ -36,11 +36,19 @@ adler --format json alice > out.json     # JSON array
 adler --format ndjson alice              # one JSON object per line (jq-friendly)
 adler --format csv alice > out.csv       # spreadsheet table
 adler --format html alice > out.html     # self-contained HTML report
+adler --report-scan <ID> > report.md     # Markdown investigation report
+adler --report-scan <ID> --report-format json > report.json
+adler --report-scan <ID> --report-format html > report.html
 adler --all alice                        # include NotFound rows
 adler -q alice                           # quiet: only Found URLs
 adler --explain alice                    # show which signal produced each verdict
 adler --color never alice                # disable colors (also honors NO_COLOR)
 ```
+
+`--format json` for a live scan intentionally remains a top-level array
+of `CheckOutcome` objects. Case-file output uses `--report-scan` so
+downstream tools can opt into the richer `InvestigationReport` model
+without breaking scan JSON consumers.
 
 ## Network & sessions
 
@@ -91,10 +99,37 @@ adler --input users.txt                      # batch many usernames, grouped out
 adler --watch alice                          # diff vs last run; new/removed
 adler --watch --interval 3600 alice          # keep watching
 adler --enrich alice                         # extract name/bio/avatar
+adler --avatar-hash --format json alice      # opt-in avatar hash evidence
 adler --correlate alice                      # group accounts by signal overlap
 adler --permute aggressive alice             # search spelling variants
 adler --completions zsh > _adler             # shell completions
 ```
+
+`--avatar-hash` only runs after profile enrichment has found avatar URLs.
+It fetches images through bounded size/type/timeout checks and stores a
+versioned perceptual hash such as `dhash64_v1:...`; raw image bytes are
+not written to scan artifacts, reports, Web API responses, or MCP
+payloads. Avatar hash matches are supporting identity evidence, not a
+standalone hard merge.
+
+## Investigation reports
+
+Finished scans persisted under `~/.cache/adler/scans/` can be rendered
+as case files:
+
+```bash
+adler --report-scan scan_123                         # Markdown, default
+adler --report-scan scan_123 --report-format json    # direct InvestigationReport JSON
+adler --report-scan scan_123 --report-format html    # local/offline HTML case file
+```
+
+Reports combine the scan summary, found accounts, high-confidence
+accounts, signal evidence, normalized profile evidence, confidence
+reasons, identity clusters, timeline events, and limitations. JSON is
+the direct `InvestigationReport` shape; Markdown and HTML are renderers
+over the same model. Report generation applies the same read-time
+historical confidence overlay as persisted Web/MCP views and does not
+rewrite the stored scan artifact.
 
 ## Doctor
 
@@ -201,6 +236,10 @@ process or on a different host.
   "why didn't this site come back Found?".
 - `get_scan_history` — recent persisted scans from
   `$XDG_CACHE_HOME/adler/scans/` (where `adler --web` writes).
+- `diff_scans` — compare two persisted scan ids; returns added /
+  removed Found accounts, verdict changes, and profile-evidence changes.
+- `get_investigation_report` — return a case-level report as direct JSON
+  `InvestigationReport` or rendered Markdown.
 
 **Resources** (browsable data):
 
@@ -211,6 +250,17 @@ process or on a different host.
   `disabled_reason` annotations (audit surface).
 - `adler://scans/recent` — recent persisted scan summaries.
 - `adler://scans/{id}` — full envelope for one scan (template).
+- `adler://scans/{from}/diff/{to}` — persisted scan diff (template).
+- `adler://timelines/{username}` — added / removed / reappeared /
+  evidence-changed timeline for a username.
+- `adler://reports/{id}` — JSON `InvestigationReport` for a persisted
+  scan.
+
+`scan_username`, `scan_batch`, persisted scan resources, and reports
+surface `evidence`, `profile_evidence`, `confidence`, transport
+metadata, and `identity_clusters`. Agent prompts instruct consumers to
+use clusters first, cite confidence reasons, and explicitly mark
+`uncertain: true` clusters as tentative.
 
 **Prompts** (templated OSINT workflows the agent can `prompts/get`):
 

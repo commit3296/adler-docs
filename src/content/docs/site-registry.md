@@ -27,10 +27,10 @@ redistribute Adler scan output and need an MIT-only data lineage, pass
 ## Detection signals
 
 Each site is probed with *multi-signal detection*: the HTTP status, body
-markers, and redirect behaviour are combined into one verdict — `Found`,
-`NotFound`, or `Uncertain(reason)` — rather than relying on a single
-status check. This lowers false positives on sites that return `200`
-for every username.
+markers, strict username markers, and redirect behaviour are combined
+into one verdict — `Found`, `NotFound`, or `Uncertain(reason)` — rather
+than relying on a single status check. This lowers false positives on
+sites that return `200` for every username.
 
 The signal pipeline is **negative-priority**: any `NotFound` vote wins
 over `Found`; no votes → `Uncertain`. A per-site `regex_check` mismatch
@@ -62,6 +62,13 @@ sites that return `200` for every username path: as soon as one signal
 fires `NotFound`, the rest don't get the chance to upgrade it. The
 trade-off is the third bucket — when no rule fires either way, we land
 in `Uncertain` instead of inventing a vote.
+
+`body_username` is the strict username-confirmation signal. Its marker
+must contain `{username}`; Adler renders it with the same canonical
+username used in `url_for()` and only attaches username profile evidence
+when the response body contains that rendered marker. A generic
+`body_present: "username"` or a URL template match is not accepted as
+username proof.
 
 The full schema lives at
 [`docs/sites.schema.json`](https://github.com/commit3296/adler/blob/main/docs/sites.schema.json)
@@ -97,10 +104,11 @@ Reddit, Imgur, Patreon). The remaining ~26% breaks down roughly as:
 - **Sites whose detection rule fires for *every* username** — signal
   repair territory, not username repair. `--doctor --fix` diffs the
   responses and proposes a tighter signal.
-- **Sites that don't reliably distinguish found from not-found** for
-  unauthenticated requests at all — investigated and not added rather
-  than ship false-positive entries: Reddit, TikTok, Pinterest, and
-  Threads. See issues
+- **Sites that don't reliably distinguish found from not-found** on
+  their canonical profile page — investigated rather than shipped as
+  false-positive entries. Reddit uses an opt-in OAuth session path,
+  Pinterest and TikTok use public oEmbed endpoints, and Threads remains
+  parked behind a login wall. See issues
   [#11–#14](https://github.com/commit3296/adler/issues?q=is%3Aissue+label%3A%22help+wanted%22)
   for the specific failure modes and what would unblock each.
 

@@ -24,6 +24,15 @@ in `sites.json`. Unconstrained policies (the common case) route through
 the [default egress](#default-egress); constrained ones go through the
 [egress pool](#egress-pool).
 
+### Avatar hash
+
+Opt-in perceptual hash evidence derived from an extracted avatar URL.
+The CLI fetches the image only when `--avatar-hash` is set, enforces
+size / content-type / timeout bounds, and stores a versioned string such
+as `dhash64_v1:...`. Raw image bytes are never persisted. Avatar hash
+matches are supporting [identity-cluster](#identity-cluster) evidence,
+not standalone identity proof.
+
 ## B
 
 ### Bot-protected
@@ -50,6 +59,18 @@ Per-scan cap on browser-routed fetches (`--browser-budget N`, default
 pre-tagged [bot-protected](#bot-protected) site consumes browser
 budget; a non-pre-tagged site that escalates from HTTP to browser
 consumes one of each.
+
+## C
+
+### Confidence
+
+Explainable per-outcome trust score (`0`–`100`) with a coarse label
+(`low`, `medium`, `high`) and machine-readable reasons. Stored on
+`CheckOutcome.confidence`, surfaced in JSON / Web / MCP / reports, and
+kept conservative: authentication, exact username evidence, rich profile
+metadata, successful escalation, and historical consistency can raise
+confidence; session-required / blocked / weak status-only paths stay
+low or capped.
 
 ## D
 
@@ -128,6 +149,22 @@ Cargo feature; routes [TLS-fingerprint-tagged](#protection-tag) sites
 through `wreq` instead of the heavier [browser
 backend](#browser-backend).
 
+### Identity cluster
+
+Deterministic grouping of Found profile outcomes that share structured
+evidence. `IdentityCluster` records members, cluster confidence,
+machine-readable reasons, and an `uncertain` flag. Shared usernames
+alone never merge accounts; weak matches such as avatar hash plus one
+other weak signal stay tentative.
+
+### Investigation report
+
+Case-level model rendered from a finished scan. `InvestigationReport`
+combines summary counts, found accounts, high-confidence accounts,
+signal evidence, [profile evidence](#profile-evidence), [confidence](#confidence),
+[identity clusters](#identity-cluster), timeline events, and
+limitations. CLI, Web, and MCP all render or return this same model.
+
 ## K
 
 ### Known-absent
@@ -165,6 +202,15 @@ failure mode).
 
 ## P
 
+### Profile evidence
+
+Normalized observed profile facts attached to a Found outcome:
+username-confirmation, display name, bio, avatar URL, avatar hash,
+external link, location, joined date, profile title, meta description,
+or extracted field. Source metadata records non-secret provenance such
+as site, URL, origin, observed timestamp, transport, and whether
+authenticated access was used.
+
 ### Protection tag
 
 A registry-level `protection` declaration that names the specific
@@ -190,9 +236,12 @@ written to scan output. A named-but-missing session yields
 
 One detection rule on a `Site`: `StatusFound { codes }`,
 `StatusNotFound { codes }`, `BodyContains`, `BodyAbsent`,
-`RedirectLocation`, etc. A site declares one or more signals; the
-verdict is the [negative-priority
+`BodyUsername`, `RedirectLocation`, etc. A site declares one or more
+signals; the verdict is the [negative-priority
 aggregation](#negative-priority-aggregation) of their votes.
+`BodyUsername` is the strict exact-username signal: its marker must
+contain `{username}` and creates username [profile evidence](#profile-evidence)
+only when the rendered marker is present in the response body.
 
 ## T
 
@@ -237,6 +286,6 @@ response), or [`Uncertain`](#uncertain). Stored as
 
 For embedders: every probe returns a `CheckOutcome` carrying `site`,
 `url`, `kind` (the [verdict](#verdict)), `reason` (only when
-`Uncertain`), `elapsed_ms`, `transport`, `escalations`, optional
-`enrichment` and `evidence`. Full Rust API on
+`Uncertain`), `elapsed_ms`, `transport`, `escalations`, signal
+`evidence`, normalized `profile_evidence`, and `confidence`. Full Rust API on
 [docs.rs/adler-core](https://docs.rs/adler-core).

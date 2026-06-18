@@ -4,12 +4,11 @@ The Web UI page renders pretty short without visual proof of the SPA.
 The five screenshots below are what's needed to make the page actually
 explain itself in 2 seconds instead of 200 words.
 
-I can't take these from the shell — Starlight can resolve the images
-once they're on disk, but the actual capture needs a browser. Please
-take them with the framing below and drop the WebP files into
-`public/screenshots/`. The Web UI page already references these paths
-with hard-coded `<img>` tags, so once the files land in place they'll
-render on the next CF Pages deploy automatically.
+Do not add `<img src="/screenshots/...">` references before the files
+exist in `public/screenshots/` — that creates broken production images
+and fails lychee. Take the screenshots with the framing below, drop the
+WebP files into `public/screenshots/`, then add the corresponding
+figures to `src/content/docs/web-ui.md` in the same PR.
 
 ## Setup
 
@@ -113,8 +112,11 @@ render on the next CF Pages deploy automatically.
 
 Once the files land in `public/screenshots/`:
 
-1. Commit + push.
-2. CF Pages rebuilds; `adler-docs.pages.dev/web-ui/` renders the
+1. Add the matching `<figure>` blocks back to
+   `src/content/docs/web-ui.md`.
+2. Run `npm run build`.
+3. Commit + push.
+4. CF Pages rebuilds; `adler-docs.pages.dev/web-ui/` renders the
    images inline.
-3. If a path mismatch makes one 404, the `<img>` tag's `alt` text falls
+5. If a path mismatch makes one 404, the `<img>` tag's `alt` text falls
    back gracefully — not blocking, but worth fixing.

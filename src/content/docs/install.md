@@ -85,8 +85,8 @@ opt-in feature flags). Include the multi-line output verbatim in bug
 reports so the maintainer doesn't have to ask which build you have:
 
 ```text
-adler 0.13.0
-commit:   4ad5db8e5723
+adler 0.15.0
+commit:   45d0979c0a7f
 target:   x86_64-unknown-linux-gnu
 features: <default>
 ```
@@ -103,7 +103,7 @@ workflow's OIDC token, exchanged for a short-lived certificate bound
 to `release.yml@<release-tag>`. Verification recipe:
 
 ```bash
-TAG=v0.13.0                                  # or whichever release
+TAG=v0.15.0                                  # or whichever release
 ARCHIVE=adler-x86_64-unknown-linux-gnu.tar.gz
 
 # Pull the archive + signature + certificate from the release.

@@ -31,12 +31,21 @@ jobs:
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build docs
+        run: npm run build
+
       - name: Run lychee
         uses: lycheeverse/lychee-action@v2
         with:
           # Config (excludes, retries, UA, accept-codes) lives in
-          # lychee.toml at the repo root and is auto-loaded.
+          # lychee.toml at the repo root and is auto-loaded. The built
+          # dist/ tree lets lychee resolve root-relative Starlight links
+          # such as /access-engine/ and /screenshots/01-live-scan.webp.
           args: >-
+            --root-dir dist
             'src/content/docs/**/*.md'
             'src/content/docs/**/*.mdx'
             'README.md'

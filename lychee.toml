@@ -2,10 +2,9 @@
 #
 # Tuning notes:
 #   - Internal Starlight links (`/access-engine/`, `/glossary/#…`) are
-#     served as relative paths at build time and resolved against the
-#     site origin at runtime. We pass `--base` from the workflow only
-#     when we want to verify them against a real deployment; in CI we
-#     just check external HTTP(S) links.
+#     served as root-relative paths at runtime. CI builds the site first
+#     and passes `--root-dir dist` so lychee can resolve those links
+#     against the generated static output instead of production.
 #   - shields.io is rate-limited and occasionally 503s — retries +
 #     cache absorb the noise without false-failing PRs.
 
@@ -21,10 +20,9 @@ retry_wait_time = 3
 exclude_path = ["dist/", "node_modules/", ".astro/"]
 
 exclude = [
-    # Site-internal pages — Starlight resolves these at runtime, not
-    # at file scan time. We rely on Astro's build to catch broken
-    # internal links (it errors on dangling `<a href="…">` against
-    # the routing table).
+    # Keep this as a fallback for raw source scans. The CI workflow
+    # passes `--root-dir dist`, so generated root-relative links can be
+    # resolved from the built site.
     "^/.*",
 
     # The CHANGELOG / specific issue / commit links are rolling — they
