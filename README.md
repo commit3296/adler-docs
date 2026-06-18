@@ -12,7 +12,7 @@ Pages** at <https://adler-docs.pages.dev/>.
 The `adler` Rust API reference lives on
 [docs.rs](https://docs.rs/adler-core); this site covers the user-facing
 manual (installation, the access engine, the web UI, embedding,
-troubleshooting).
+investigation reports, troubleshooting).
 
 ## Repository layout
 
@@ -26,6 +26,7 @@ troubleshooting).
 │   │   ├── index.mdx
 │   │   ├── install.md
 │   │   ├── quickstart.md
+│   │   ├── first-scan.md
 │   │   ├── usage.md
 │   │   ├── access-engine.md
 │   │   ├── web-ui.md
@@ -49,6 +50,21 @@ npm run dev      # http://localhost:4321/
 npm run build    # produces dist/
 npm run preview  # serve dist/ for a final sanity-check before push
 ```
+
+## Content priorities
+
+Keep the first-user path current with the shipped Adler binary:
+
+1. Install the binary and verify it.
+2. Run a small explained scan.
+3. Read verdicts, confidence, signal evidence, and profile evidence.
+4. Use enrichment / Web UI when identity clusters or report exports
+   matter.
+5. Export finished scans as Markdown, JSON, or HTML investigation
+   reports for handoff.
+
+When the Web UI changes, update `public/screenshots/` and
+`SCREENSHOTS.md` in the same PR as the affected guide text.
 
 ## Deploy
 

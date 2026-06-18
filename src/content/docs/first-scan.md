@@ -8,30 +8,34 @@ description: A guided tutorial that takes you from a fresh install to a useful s
 
 <aside class="tldr">
 
-Seven steps, ~15 minutes:
+Eight steps, ~15 minutes:
 
 1. **Install** with `cargo binstall adler-cli`.
-2. **Run** `adler torvalds` and read the streaming output.
-3. **Understand** the three verdicts — `Found`, `NotFound`, `Uncertain(reason)`.
+2. **Run** `adler --explain torvalds` and read the streaming output.
+3. **Understand** the verdicts, confidence score, and evidence lines.
 4. **Aggregate** Uncertain reasons with `--format ndjson | jq` to find the dominant cause.
 5. **Remedy** the dominant cause — usually a residential proxy via `--proxy socks5://...`.
 6. **Compare** before / after by diffing the NDJSON dumps.
-7. **Automate** with `--watch` or the bundled web UI (`--web`).
+7. **Export** a persisted scan as a Markdown / JSON / HTML investigation report.
+8. **Automate** with `--watch` or the bundled web UI (`--web`).
 
 </aside>
 
 This tutorial takes you end-to-end on your first scan — installing
 Adler, running it, reading the output, hitting `Uncertain`, fixing
-`Uncertain`, watching the verdict improve, and saving the workflow for
-next week. It's longer than the [Quickstart](/quickstart/) because the
-goal here isn't a 60-second demo; it's making sure you actually
-*understand* what Adler is doing before you scale it up.
+`Uncertain`, watching the verdict improve, exporting a case file, and
+saving the workflow for next week. It's longer than the
+[Quickstart](/quickstart/) because the goal here isn't a 60-second demo;
+it's making sure you actually *understand* what Adler is doing before
+you scale it up.
 
 You'll spend about 15 minutes. By the end, you'll have:
 
 - A working install
 - One real scan you've inspected
+- Signal evidence and confidence reasons you can explain
 - A working remedy for at least one `Uncertain` row
+- A case-file export path for handoff or downstream tooling
 - A repeatable workflow (`--watch`) for tracking the same name week to
   week
 
@@ -74,7 +78,7 @@ Pick a username you know exists on at least one site — a real human's
 GitHub handle works. We'll use `torvalds`:
 
 ```bash
-adler torvalds
+adler --explain torvalds
 ```
 
 What you see:
@@ -84,9 +88,12 @@ What you see:
   NotFound rows hidden by default (pass `--all` to include them).
 - **Categorised** — `dev`, `social`, `forum`, etc., based on each
   site's tags.
-- **Per-row metadata** at the right — elapsed time, verdict reason for
-  Uncertain rows, the [transport](/glossary/#transport-tier) chip when
-  it's not plain HTTP.
+- **Per-row metadata** — elapsed time, verdict reason for Uncertain
+  rows, confidence score when available, and the
+  [transport](/glossary/#transport-tier) chip when it's not plain HTTP.
+- **Explainability lines** — `--explain` prints the signal evidence,
+  confidence reasons, and any structured profile evidence attached to
+  the outcome.
 
 Expect mostly `Found` for `torvalds` (he's on a lot of dev platforms)
 and a sprinkle of `Uncertain` (CDN edges, login walls).
@@ -108,17 +115,39 @@ Adler's whole identity is in that third row. See
 implication is: an `Uncertain` is *not* a failure of Adler, it's
 information about the site or your network.
 
-For the verdict reasons, inspect any individual row with `--explain`:
+Confidence is the second thing to read. It is conservative and
+explainable: signal evidence, exact username matches, authenticated
+access, browser/impersonate transports, rich profile metadata, and
+stable history can raise it; weak status-only results, blocked
+transports, session-required paths, CAPTCHA, and rate-limits keep it
+low. The reasons are printed by `--explain` and are serialized in JSON,
+Web, MCP, and reports.
+
+For a focused explanation pass, inspect a small subset:
 
 ```bash
 adler --explain --only github,gitlab torvalds
 ```
 
 You'll see the signal that produced each verdict. On `Found`, that's
-the matching status / body marker / redirect rule. On `Uncertain`,
-it's the [`UncertainReason`](/glossary/#uncertain-reasons) — typically
-something like `cloudflare_challenge`, `rate_limited`, `geo_unavailable`,
-or `session_required`.
+the matching status / body marker / redirect rule, plus confidence
+reasons such as `found by detection signal` or `exact username match`.
+On `Uncertain`, it's the
+[`UncertainReason`](/glossary/#uncertain-reasons) — typically something
+like `cloudflare_challenge`, `rate_limited`, `geo_unavailable`, or
+`session_required`.
+
+When you need profile evidence for correlation, add enrichment:
+
+```bash
+adler --enrich --explain --only github,gitlab torvalds
+```
+
+Structured `profile_evidence` is intentionally narrow: display names,
+bio snippets, avatar URLs, external links, locations, exact username
+evidence from explicit registry signals, and opt-in avatar hashes.
+Identity clusters use these structured fields; username-only overlap is
+not enough to merge accounts.
 
 ---
 
@@ -214,7 +243,39 @@ banned — possible but rare on quality residential pools).
 
 ---
 
-## Step 7 — Make it a workflow
+## Step 7 — Export a case file
+
+When a result is leaving your terminal, export an investigation report
+instead of handing over raw scan rows. Reports combine summary counts,
+found accounts, high-confidence accounts, signal evidence, normalized
+profile evidence, confidence reasons, identity clusters, timeline
+events, and limitations.
+
+The easiest route is the Web UI:
+
+```bash
+adler --web
+# Open http://127.0.0.1:8080, run a scan, wait for Done, use JSON / Markdown / HTML exports.
+```
+
+The scan id is visible in the route (`#/scan/<id>`). The same persisted
+scan can be rendered from the CLI:
+
+```bash
+adler --report-scan <SCAN_ID> > report.md
+adler --report-scan <SCAN_ID> --report-format json > report.json
+adler --report-scan <SCAN_ID> --report-format html > report.html
+```
+
+Use Markdown for notes and tickets, JSON for downstream tools, and HTML
+for a self-contained local case file. HTML reports are offline-safe:
+inline CSS, no JavaScript, and no automatic external avatar/image
+loads. See [Investigation reports](/investigation-reports/) for the
+full report model.
+
+---
+
+## Step 8 — Make it a workflow
 
 Two patterns to graduate from "one-off scan" to "I monitor this name":
 
@@ -230,8 +291,9 @@ only the rows that *changed* — new accounts, removed accounts, flipped
 verdicts. Pipe it into your alert channel of choice.
 
 **Pattern B — Web UI for visual review.** If you want a real interface
-with history, side-by-side diff, evidence drawers, and the [access
-engine view](/web-ui/#access-engine-view), launch the bundled SPA:
+with history, side-by-side diff, evidence drawers, confidence chips,
+identity clusters, report exports, and the [access engine
+view](/web-ui/#access-engine-view), launch the bundled SPA:
 
 ```bash
 adler --web
@@ -246,9 +308,11 @@ See the [Web UI](/web-ui/) page for the full feature tour.
 
 - Adler's three-verdict model and why `Uncertain` is information, not
   failure.
-- How to inspect verdict reasons with `--explain` and `--format ndjson`.
+- How to inspect signal evidence, confidence reasons, and profile
+  evidence with `--explain`, `--enrich`, and `--format ndjson`.
 - That datacenter IPs cause most `Uncertain`s and how to remedy them.
 - How to layer a residential proxy + browser backend.
+- How to export a case-level investigation report.
 - Two workflow patterns for tracking a name over time.
 
 ## Where to read next
@@ -257,7 +321,9 @@ See the [Web UI](/web-ui/) page for the full feature tour.
   backend, escalation, egress pool, sessions, impersonation) once you
   hit edge cases this tutorial didn't cover.
 - [**Web UI**](/web-ui/) — the SPA's feature tour, including per-scan
-  egress subset selection from the Advanced filters modal.
+  egress subset selection, identity clusters, and report exports.
+- [**Investigation reports**](/investigation-reports/) — Markdown,
+  JSON, HTML, Web API, and MCP case-file output.
 - [**Honest verdicts**](/honest-verdicts/) — the philosophy doc behind
   the three-verdict model.
 - [**FAQ**](/faq/) — common edge cases and gotchas.

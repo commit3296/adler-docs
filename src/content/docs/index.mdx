@@ -47,6 +47,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     embedding; `adler --web` launches a SolidJS SPA with live SSE streaming;
     JSON API for driving from your own frontend or scripts.
   </Card>
+  <Card title="Evidence · Confidence · Reports" icon="document">
+    Every result can carry signal evidence, profile evidence, transport
+    metadata, and conservative confidence reasons. Finished scans can become
+    Markdown, JSON, or HTML investigation reports with identity clusters and
+    timeline context.
+  </Card>
 </CardGrid>
 
 ## Reading order
@@ -54,8 +60,9 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 For first-time users:
 
 1. **[Install](/install/)** — `cargo binstall`, `cargo install`, or build from source.
-2. **[Quickstart](/quickstart/)** — first scan in under a minute.
-3. **[Usage](/usage/)** — filtering / output / network / browser / batch.
+2. **[Quickstart](/quickstart/)** — first scan, `--explain`, enrichment, and report export path.
+3. **[First scan walkthrough](/first-scan/)** — guided scan → evidence → confidence → case-file flow.
+4. **[Usage](/usage/)** — filtering / output / reports / network / browser / batch.
 
 For operators going beyond the basics:
 
@@ -63,7 +70,9 @@ For operators going beyond the basics:
   that block plain HTTP (browser backend, impersonate, egress pool,
   sessions, automatic escalation).
 - **[Web UI](/web-ui/)** — the SPA, the access modal, per-scan
-  egress subset selection.
+  egress subset selection, identity clusters, and report exports.
+- **[Investigation reports](/investigation-reports/)** — Markdown,
+  JSON, HTML, Web API, and MCP case-file output.
 - **[Embedding](/embedding/)** — drive `adler-core` from your
   own Rust code.
 
