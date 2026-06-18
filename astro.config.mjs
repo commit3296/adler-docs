@@ -126,6 +126,7 @@ mermaid.initialize({
                     items: [
                         { slug: "install" },
                         { slug: "web-ui" },
+                        { slug: "investigation-reports" },
                         { slug: "embedding" },
                     ],
                 },

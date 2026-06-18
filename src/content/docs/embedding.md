@@ -207,7 +207,7 @@ subprocess (see [Web UI → JSON API](/web-ui/#json-api)).
 | `CheckOutcome.transport` / `escalations` | telemetry — which transport produced the verdict, how many escalations happened. |
 | `CheckOutcome.evidence` / `profile_evidence` / `confidence` | explainability payload: signal evidence, normalized profile facts, and machine-readable confidence reasons. |
 | `build_identity_clusters(username, outcomes)` | deterministic account grouping from structured profile evidence; never merges on username alone. |
-| `InvestigationReportBuilder` | case-level report model that combines summary, found accounts, high-confidence accounts, evidence table, identity clusters, timeline, and limitations. |
+| `InvestigationReportBuilder` | case-level report model that combines summary, found accounts, high-confidence accounts, evidence table, identity clusters, timeline, and limitations. See [Investigation reports](/investigation-reports/). |
 | `avatar_hash_from_bytes` / `fetch_avatar_hash` | opt-in avatar perceptual hash helpers; callers must decide when external avatar fetching is appropriate. |
 
 ## Outcome telemetry

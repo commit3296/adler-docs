@@ -163,7 +163,8 @@ Case-level model rendered from a finished scan. `InvestigationReport`
 combines summary counts, found accounts, high-confidence accounts,
 signal evidence, [profile evidence](#profile-evidence), [confidence](#confidence),
 [identity clusters](#identity-cluster), timeline events, and
-limitations. CLI, Web, and MCP all render or return this same model.
+limitations. CLI, Web, and MCP all render or return this same model; see
+[Investigation reports](/investigation-reports/).
 
 ## K
 
