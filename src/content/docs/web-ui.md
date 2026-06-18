@@ -25,6 +25,16 @@ Outcomes stream in as they resolve (SSE), grouped by category, with
 per-row evidence (verdict reason, response snippet, URL), confidence
 chips, and a one-click retry.
 
+<figure>
+  <img
+    src="/screenshots/01-live-scan.webp"
+    alt="Adler Web UI showing a running scan for alice with grouped streaming results, confidence chips, and a browser transport chip."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>Running scan view with grouped SSE results and per-row confidence.</figcaption>
+</figure>
+
 The hero input has a **single / batch tab pair**: single takes one
 username (the canonical scan); batch
 <span class="since-chip">since v0.8.3</span> takes a textarea that
@@ -54,10 +64,30 @@ drawer: signal evidence, confidence reasons, structured
 `profile_evidence`, transport, escalation count, and non-secret evidence
 source metadata when present.
 
+<figure>
+  <img
+    src="/screenshots/02-result-row-detail.webp"
+    alt="Finished Adler scan with a GitHub result row expanded to show confidence reasons, signal evidence, profile evidence, and report export links."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>Expanded result row showing confidence reasons, signal evidence, profile evidence, and case-file exports.</figcaption>
+</figure>
+
 ### History
 
 Every finished scan is persisted to `~/.cache/adler/scans/` (oldest 200,
 atomic writes). Reopen any past scan via `#/scan/<id>` deep-links.
+
+<figure>
+  <img
+    src="/screenshots/03-history-modal.webp"
+    alt="Adler Web UI history modal listing previous scans with usernames, summaries, and relative timestamps."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>History modal for reopening or comparing persisted scans.</figcaption>
+</figure>
 
 ### Compare with previous
 
@@ -73,6 +103,16 @@ Enter keeps the old auto-pick-newest default for the common case;
 clicking any other row diffs against that specific historical scan.
 Each row shows the relative timestamp ("3h ago"), found/total/elapsed
 metadata, and the absolute timestamp on the right.
+
+<figure>
+  <img
+    src="/screenshots/04-diff-view.webp"
+    alt="Adler Web UI diff view showing added accounts, verdict changes, and evidence changes between two scans."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>Diff view for added accounts, verdict flips, and evidence changes.</figcaption>
+</figure>
 
 ### Filters & sort
 
@@ -126,6 +166,16 @@ loaded from `--proxy-pool` (name, country, kind per egress — *never*
 proxy URLs) and `--sessions` (names only, never header values).
 Sensitive material is kept off the HTTP API by design; editing happens
 by updating the TOML files and restarting the server.
+
+<figure>
+  <img
+    src="/screenshots/05-access-modal.webp"
+    alt="Adler Web UI access engine modal showing egress countries, egress kinds, and session names without proxy URLs or secret values."
+    loading="lazy"
+    decoding="async"
+  />
+  <figcaption>Access engine modal exposes only non-secret routing and session metadata.</figcaption>
+</figure>
 
 ### Per-scan egress subset <span class="since-chip">since v0.11</span>
 
